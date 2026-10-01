@@ -50,7 +50,7 @@ namespace Eggs.Gameplay
                 && inputCamera.pixelRect.Contains(screenPoint))
                 BeginDrag(worldPoint);
 
-            if (draggedUnit == null || !draggedUnit.isActiveAndEnabled)
+            if (draggedUnit == null || !draggedUnit.isActiveAndEnabled || draggedUnit.IsInteractionLocked)
             {
                 FinishDrag(false);
                 return;
@@ -79,7 +79,7 @@ namespace Eggs.Gameplay
             foreach (Collider2D hit in hitColliders)
             {
                 UnitActor unit = hit.GetComponentInParent<UnitActor>();
-                if (unit == null || !unit.isActiveAndEnabled)
+                if (unit == null || !unit.isActiveAndEnabled || unit.IsInteractionLocked)
                     continue;
 
                 SortingGroup group = unit.GetComponent<SortingGroup>();
@@ -109,7 +109,8 @@ namespace Eggs.Gameplay
 
         private void FinishDrag(bool assignDrop)
         {
-            if (draggedUnit != null)
+            // A lock acquired during a drag must not clear the new work assignment.
+            if (draggedUnit != null && !draggedUnit.IsInteractionLocked)
             {
                 WorkZone zone = null;
                 if (assignDrop)

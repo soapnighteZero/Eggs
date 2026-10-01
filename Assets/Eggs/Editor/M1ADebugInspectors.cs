@@ -15,6 +15,7 @@ namespace Eggs.Editor
             {
                 EditorGUILayout.EnumPopup("Current State", unit.CurrentState);
                 EditorGUILayout.ObjectField("Current Zone", unit.CurrentZone, typeof(WorkZone), true);
+                EditorGUILayout.Toggle("Interaction Locked", unit.IsInteractionLocked);
             }
             if (Application.isPlaying)
                 Repaint();

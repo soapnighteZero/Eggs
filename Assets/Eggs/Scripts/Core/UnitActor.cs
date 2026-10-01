@@ -7,6 +7,12 @@ namespace Eggs.Gameplay
     {
         public UnitWorkState CurrentState { get; private set; } = UnitWorkState.Idle;
         public WorkZone CurrentZone { get; private set; }
+        public bool IsInteractionLocked { get; private set; }
+
+        public void SetInteractionLocked(bool locked)
+        {
+            IsInteractionLocked = locked && isActiveAndEnabled;
+        }
 
         // The only entry point for both state changes and zone membership changes.
         public void AssignTo(WorkZone zone)
@@ -30,6 +36,7 @@ namespace Eggs.Gameplay
 
         private void OnDisable()
         {
+            SetInteractionLocked(false);
             AssignTo(null);
         }
     }
