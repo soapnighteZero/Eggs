@@ -9,6 +9,8 @@ namespace Eggs.Gameplay
         [Min(0.05f)] [SerializeField] private float hatchDuration = 4f;
         [SerializeField] private UnitActor unitPrefab;
         [SerializeField] private GameState gameState;
+        [SerializeField] private WorkZone defaultIdleZone;
+        [SerializeField] private Transform newbornSpawnPoint;
         [SerializeField] private Vector3 unitSpawnOffset = new Vector3(2.6f, -2.6f, 0f);
         [SerializeField] private TextMesh countdownLabel;
 
@@ -21,24 +23,30 @@ namespace Eggs.Gameplay
             && unitPrefab.GetComponentInChildren<SpriteRenderer>() != null
             && unitPrefab.GetComponent<SortingGroup>() != null;
 
-        public void Initialize(GameState state)
+        private bool HasIdleGeometry => defaultIdleZone != null && defaultIdleZone.Shape == WorkZoneShape.Ring
+            && defaultIdleZone.TargetState == UnitWorkState.Idle && defaultIdleZone.HasValidGeometry;
+
+        public void Initialize(GameState state, WorkZone idleZone, Transform spawnPoint = null)
         {
             gameState = state;
+            defaultIdleZone = idleZone;
+            newbornSpawnPoint = spawnPoint;
         }
 
         private void Start()
         {
-            if (gameState == null || !HasValidUnitPrefab)
+            if (gameState == null || !HasValidUnitPrefab || !HasIdleGeometry)
             {
                 Debug.LogError("EggHatch needs GameState and an active Unit prefab with UnitActor, "
-                    + "Collider2D, SpriteRenderer and SortingGroup.", this);
+                    + "Collider2D, SpriteRenderer and SortingGroup, plus an Idle spawn ring.", this);
                 enabled = false;
             }
         }
 
         private void Update()
         {
-            if (HasHatched || gameState == null || !gameState.isActiveAndEnabled)
+            if (HasHatched || gameState == null || !gameState.isActiveAndEnabled
+                || !HasIdleGeometry || !defaultIdleZone.CanAcceptUnits)
                 return;
 
             elapsed += Time.deltaTime;
@@ -53,9 +61,10 @@ namespace Eggs.Gameplay
 
             // Set before spawning: repeated calls cannot spawn twice or add Population twice.
             HasHatched = true;
-            UnitActor unit = Instantiate(unitPrefab, transform.position + unitSpawnOffset, Quaternion.identity);
+            Vector3 desired = newbornSpawnPoint != null ? newbornSpawnPoint.position : transform.position + unitSpawnOffset;
+            UnitActor unit = Instantiate(unitPrefab, defaultIdleZone.GetSafePosition(desired), Quaternion.identity);
             unit.SetInteractionLocked(false);
-            unit.AssignTo(null);
+            unit.AssignTo(defaultIdleZone);
             gameState.AddPopulation(1);
             unit.name = $"Unit {gameState.Population}";
             Destroy(gameObject);

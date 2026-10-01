@@ -9,6 +9,10 @@ namespace Eggs.Gameplay
         [SerializeField] private WorkZone loveNestZone;
         [SerializeField] private EggHatch eggPrefab;
         [SerializeField] private Transform eggSpawnPoint;
+        [SerializeField] private WorkZone standbyZone;
+        [SerializeField] private Transform postBreedReturnPointA;
+        [SerializeField] private Transform postBreedReturnPointB;
+        [SerializeField] private Transform newbornSpawnPoint;
         [Min(0)] [SerializeField] private int breedingFoodCost = 5;
         [Min(0.05f)] [SerializeField] private float breedingDuration = 5f;
         [SerializeField] private TextMesh statusLabel;
@@ -21,16 +25,18 @@ namespace Eggs.Gameplay
         public bool IsBreeding { get; private set; }
         public float RemainingSeconds => remainingSeconds;
         public EggHatch ActiveEgg => activeEgg;
+        private bool HasStandbyGeometry => standbyZone != null && standbyZone.Shape == WorkZoneShape.Ring
+            && standbyZone.TargetState == UnitWorkState.Idle && standbyZone.HasValidGeometry;
 
         private void Start()
         {
             if (gameState == null || loveNestZone == null
                 || loveNestZone.TargetState != UnitWorkState.Breeding || eggSpawnPoint == null
                 || eggPrefab == null || !eggPrefab.HasValidUnitPrefab
-                || !eggPrefab.enabled || !eggPrefab.gameObject.activeSelf)
+                || !eggPrefab.enabled || !eggPrefab.gameObject.activeSelf || !HasStandbyGeometry)
             {
                 Debug.LogError("BreedingSystem needs GameState, a Breeding WorkZone, a spawn point "
-                    + "and an active Egg prefab with a valid Unit prefab reference.", this);
+                    + "an active Egg prefab with a valid Unit prefab reference, and an Idle standby ring.", this);
                 enabled = false;
             }
         }
@@ -38,7 +44,8 @@ namespace Eggs.Gameplay
         private void Update()
         {
             if (gameState == null || !gameState.isActiveAndEnabled || loveNestZone == null
-                || !loveNestZone.CanAcceptUnits || loveNestZone.TargetState != UnitWorkState.Breeding)
+                || !loveNestZone.CanAcceptUnits || loveNestZone.TargetState != UnitWorkState.Breeding
+                || !HasStandbyGeometry || !standbyZone.CanAcceptUnits)
             {
                 EndCycle();
                 return;
@@ -107,7 +114,7 @@ namespace Eggs.Gameplay
 
                 activeEgg = Instantiate(eggPrefab, eggSpawnPoint.position, Quaternion.identity);
                 // Scene state is injected before the spawned Egg's Start/Update.
-                activeEgg.Initialize(gameState);
+                activeEgg.Initialize(gameState, standbyZone, newbornSpawnPoint);
             }
             finally
             {
@@ -119,18 +126,27 @@ namespace Eggs.Gameplay
         {
             IsBreeding = false;
             remainingSeconds = 0f;
-            ReleaseUnit(firstUnit);
-            ReleaseUnit(secondUnit);
+            ReleaseUnit(firstUnit, postBreedReturnPointA, Vector3.left);
+            ReleaseUnit(secondUnit, postBreedReturnPointB, Vector3.right);
             firstUnit = null;
             secondUnit = null;
         }
 
-        private static void ReleaseUnit(UnitActor unit)
+        private void ReleaseUnit(UnitActor unit, Transform returnPoint, Vector3 fallbackDirection)
         {
             if (unit == null)
                 return;
             unit.SetInteractionLocked(false);
-            unit.AssignTo(null);
+            if (HasStandbyGeometry)
+            {
+                Vector3 desired = returnPoint != null ? returnPoint.position
+                    : standbyZone.RingCenter.position + fallbackDirection
+                        * ((standbyZone.InnerRadius + standbyZone.OuterRadius) * 0.5f);
+                unit.transform.position = standbyZone.GetSafePosition(desired);
+                unit.AssignTo(standbyZone);
+            }
+            else
+                unit.AssignTo(null);
         }
 
         private void LateUpdate()

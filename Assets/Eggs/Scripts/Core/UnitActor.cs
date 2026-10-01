@@ -5,9 +5,18 @@ namespace Eggs.Gameplay
     [DisallowMultipleComponent]
     public sealed class UnitActor : MonoBehaviour
     {
+        [Tooltip("Optional scene assignment at startup. Legacy M1A leaves this empty.")]
+        [SerializeField] private WorkZone initialZone;
+
         public UnitWorkState CurrentState { get; private set; } = UnitWorkState.Idle;
         public WorkZone CurrentZone { get; private set; }
         public bool IsInteractionLocked { get; private set; }
+
+        private void Start()
+        {
+            if (initialZone != null && CurrentZone == null)
+                AssignTo(initialZone);
+        }
 
         public void SetInteractionLocked(bool locked)
         {

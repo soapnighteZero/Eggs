@@ -129,14 +129,13 @@ There must be only one authoritative runtime value for each of:
 
 Do not create multiple competing managers that each own the same value.
 
-A Unit may belong to exactly one work state at a time.
+A Unit may have one current assignment/state and belong to at most one WorkZone.
 
-Initial work states:
+Current formal work states:
 
 - Idle
 - Gathering
 - Breeding
-- Defending
 
 When a Unit changes work:
 
@@ -144,7 +143,17 @@ When a Unit changes work:
 2. assign the new state;
 3. ensure old zones no longer retain it.
 
-No Unit may simultaneously produce Food and Breed or Defend.
+Gathering and Breeding Units are not eligible for automatic defense.
+Idle Units are the future automatic-defense pool: an Idle Unit is available for
+automatic defense in M2, whether assigned to Guard Ring or unassigned on blank space.
+
+Defending enum value remains only for legacy M1A compatibility. It is not a
+formal M1B/M2 work assignment. Do not delete or renumber it while M1A uses it.
+
+Formal space is concentric around Love Nest: Nest Core (Breeding), Guard / Standby
+Ring (Idle), then Food Rings (Gathering). Guard Ring is a real WorkZone with Idle
+membership. Food production reads current members of valid, available Food Rings.
+Future per-ring food availability must not create another Food state owner.
 
 ---
 

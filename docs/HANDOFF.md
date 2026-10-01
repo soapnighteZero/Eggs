@@ -2,163 +2,177 @@
 
 ## Current Milestone
 
-M1B - Food, Breeding, Egg and Population Growth
+M1B - Ring-based Regrowth Prototype
 
 ## Status
 
-Implementation complete, pending Unity Play verification.
+Implementation revised for concentric-ring design, pending Unity Play Verification.
 
-M1A was Play-verified under Unit terminology by the user before M1B started. M1B has not been run in Unity: **None / Pending Play Verification**. M2 has not started.
+The old rectangular M1B implementation was never Play Verified. Its three-zone layout has been replaced directly by the formal concentric-ring layout; it is not an acceptance target. M1A's historical Play Verified result remains preserved below. M2 rules were updated in documentation only; no M2 gameplay has been implemented.
 
-## Baseline and Working Tree
+## Baseline
 
 - Branch: `Dada`.
-- Expected and actual baseline HEAD: `2a21badccea3bc50fab3380ebc65d5da610ac560`.
-- Unity: `6000.6.3f1 (45d8eee7de74)`; existing Input System package: `1.20.0`.
-- At the start of M1B, nine existing PNG `.meta` files under `Assets/Eggs/Art/` were modified. Their diffs add Sprite subasset names, IDs and rectangles. These pre-existing changes were reported and preserved byte-for-byte.
-- Existing M1A scene, Unit prefab, M1A builder, art files, generated placeholders, SampleScene, Packages and ProjectSettings were preserved. Shared Unit interaction scripts received only the interaction-lock additions described below.
+- Expected and actual HEAD at the start of this revision: `5ec7b30897bbd15711f17f4f0b1601a62d385375`.
+- Unity: `6000.6.3f1 (45d8eee7de74)`.
+- Working tree was clean at the start of this revision.
+- `Eggs_M1B.unity` and `Egg_M1B.prefab` did not exist. No serialized rectangular M1B scene/prefab needed migration. The existing M1A scene, Unit prefab and M1A builder were inspected and preserved.
 
-## Completed
+## Formal Spatial Rules
 
-### GameState and Food
+Love Nest is centered at world `(0, 0)`. The M1B drag controller receives these four WorkZones in this order:
 
-- `GameState` is the only runtime owner of Food and Population. Serialized defaults are startingFood = 10 and startingPopulation = 4; public runtime values have private setters.
-- `AddFood`, `TrySpendFood` and `AddPopulation` reject invalid negative changes or overspending and avoid integer overflow. Values cannot become negative. Disabling/re-enabling the component does not reset the economy.
-- `FoodProductionSystem` references the existing Gathering WorkZone. Every 1-second tick adds its current MemberCount × foodPerUnitPerTick (default 1). It does not cache prior members, so dragging a Unit away removes its contribution from the next tick. Disabling the system resets the partial tick; an unavailable zone or GameState stops production.
-- No Unit upkeep or additional resource was introduced.
+| Zone | Default radial interval | State | Purpose |
+| --- | --- | --- | --- |
+| Nest Core | `[0, 1.1)` | Breeding | Central breeding area and Egg spawn |
+| Guard Ring | `[1.1, 2.5)` | Idle | Initial, returning and newborn Units |
+| Food Ring A | `[2.5, 3.7)` | Gathering | Food production |
+| Food Ring B | `[3.7, 4.9]` | Gathering | Food production |
 
-### Interaction Lock and Breeding
+Shared boundaries belong to the outer neighboring zone; the outermost edge belongs to Food B. This avoids both gaps and overlap rejection at shared seams. Generic Ring zones include their outer boundary by default; the M1B builder explicitly disables that option on the three inner zones.
 
-- `UnitActor` exposes `IsInteractionLocked` and `SetInteractionLocked`. Disabling the Unit clears its lock and assignment. The Unit Inspector displays the lock read-only.
-- `UnitDragController` ignores locked Units when selecting from overlapping colliders. If a Unit becomes locked during a drag, the controller stops dragging without clearing the newly locked assignment, and restores its sorting order.
-- `BreedingSystem` uses the existing Breeding WorkZone. With no active cycle or unhatched Egg, it selects two active, unlocked members and calls `GameState.TrySpendFood` once. Default cost: 5 Food; duration: 5 seconds.
-- Insufficient Food leaves both Units assigned to Breeding and unlocked, with no charge, timer or Egg. A cycle can start automatically once Food becomes sufficient.
-- An active cycle holds the two participant references and a timer. It cannot charge again or start another cycle. Completion creates one Egg, unlocks both Units and calls `AssignTo(null)` on each, removing their memberships and returning them to Idle. Their positions are retained; standing inside the Nest does not reassign them.
-- The active Egg reference blocks all further cycles until that Egg is destroyed after hatching. Disabling/re-enabling BreedingSystem preserves this reference. A disabled Egg still occupies the slot and can resume incubation when re-enabled.
-- Disabling BreedingSystem immediately cancels its active cycle and releases both Units. If a participant, the Nest or GameState becomes unavailable, the next system update cancels the cycle and releases its remaining participants. An interrupted cycle creates no Egg and does not refund its already-paid Food; no further Food is charged.
+Radii are serialized WorkZone Inspector fields. Named radius constants at the top of `M1BPrototypeBuilder` supply rebuild defaults. When editing radii in a saved scene, adjust adjacent inner/outer radii together; WorkZone geometry is measured in world units around its assigned center. Outlines track outer-radius and center changes, and selected-zone Gizmos show both bounds. The drag controller still rejects genuine overlapping valid zones with a warning.
 
-### Egg, Hatch and Population
+A drop outside all valid rings becomes `CurrentZone = null`, `CurrentState = Idle`. Guard drops become `CurrentZone = Guard Ring`, `CurrentState = Idle`. No separate Guarding or Defending job was introduced.
 
-- `EggHatch` uses a serialized Unit prefab reference. The builder connects the existing `Unit_M1A.prefab`, preserving the same UnitActor, Collider2D, SpriteRenderer, SortingGroup and debug label behavior.
-- BreedingSystem injects its scene GameState reference into the spawned Egg before Start/Update; runtime code performs no asset-path lookup.
-- Default incubation is 4 seconds. The one-shot hatch flag is set before spawning, so repeated calls cannot create another Unit or add Population again.
-- Hatching spawns one ordinary Unit, explicitly clears its lock/assignment, increments GameState Population once and destroys the Egg. The Unit starts Idle and can use all existing work assignments.
-- The default spawn offset is `(2.6, -2.6, 0)` relative to the Egg: near the Nest, outside its center and away from the initial Unit row. The offset is Inspector-editable. There is no juvenile or species-specific logic.
-- Disabling EggHatch pauses incubation; re-enabling retains its timer and hatch guard.
+`Defending = 3` is retained only for legacy M1A compatibility. Current formal gameplay derives automatic defense eligibility from Idle. Automatic defense is not implemented in M1B.
 
-### HUD and Art Foundation
+## What Changed and What Was Reused
 
-- `M1BHud` only reads GameState and writes Food/Population into numeric TextMesh labels. It owns no economy state or counting logic.
-- Builder wiring uses the existing `food_label_zh.png` and `population_label_zh.png` for fixed Chinese labels; numbers use built-in `LegacyRuntime.ttf`. No font package or fixed-number image was added.
-- Builder wiring uses `egg_neutral.png` and `love_nest_base.png` for Egg/Nest visuals. All four formal-art SpriteRenderers use white color. Colored zone rectangles remain separate placeholders.
-- Optional TextMesh feedback shows `BREEDING 3.2s`, `EGG 3.5s`, and insufficient-Food feedback. GameState and BreedingSystem Inspectors show read-only runtime values.
-- Art Foundation remains established: Runtime uses Unit; visual identity uses Creature and can be replaced through Prefab/Inspector without changing economy or assignment code.
-- **Playable population Creature / Unit base visual still needs final confirmation or artwork.** M1B continues using the existing Unit placeholder. Archer and guardian remain references, with no abilities or careers added.
+### WorkZone and initial membership
 
-### M1B Builder
+- `WorkZoneShape` has `Collider = 0` and `Ring = 1`. Existing M1A YAML therefore continues to use Collider mode without asset migration. Its dropArea and snap behavior remain available.
+- WorkZone accepts Units when its component is active, acceptance is enabled and geometry is valid. Idle is now a valid target state.
+- Ring geometry requires a center, finite radii, innerRadius >= 0 and outerRadius > innerRadius. Invalid or disabled zones cannot accept drops.
+- `GetSafePosition` preserves an existing in-ring point. Otherwise it projects the point's direction onto the ring's middle radius, preserving Z. A point at the center uses the fixed +X direction. `GetDropPosition` uses this placement in Ring mode while retaining optional snap behavior.
+- `UnitActor` still owns exactly one zone/state through `AssignTo`. It now has an optional serialized initialZone applied once at Start. The builder sets it on each initial Unit instance to Guard; the shared prefab and M1A instances retain their empty default.
+- `UnitDragController` was reused unchanged: locked selection filtering, single-Unit dragging, pickup removal, overlap rejection and invalid-drop handling remain intact.
 
-Menu: **Tools > Eggs > Build M1B Prototype**.
+### Multi-ring Food production
 
-On manual execution it creates or rebuilds:
+- FoodProductionSystem now reads `WorkZone[] foodZones`, wired to Food A and B.
+- Each tick sums current MemberCount across valid, accepting Gathering zones with available resources. Null, disabled, invalid, wrong-state and unavailable entries are skipped. A reused HashSet prevents duplicate zone references from being counted twice; UnitActor's exclusive membership prevents duplicate Unit ownership.
+- `resourceAvailable` / `SetResourceAvailable(bool)` is a small future per-zone availability hook. It gates Food production only, retaining geometry and membership. Both Food Rings start available.
+- No random refresh, depletion, capacity, respawn timer or pickup animation was implemented.
+- GameState remains the sole owner of Food and Population. Its source file is unchanged; defaults remain Food = 10 and Population = 4. The 1-second gather interval and 1 Food per Unit per tick are unchanged.
+
+### Breeding return to Guard
+
+- Existing two-participant selection, one-time 5 Food charge, interaction lock, 5-second timer and single-Egg restriction were reused.
+- BreedingSystem now references standbyZone, optional postBreedReturnPointA/B and an optional newbornSpawnPoint to pass into the Egg.
+- Completion still creates exactly one Egg and releases both participants. It now unlocks each, places it safely inside Guard and calls `AssignTo(standbyZone)`: Idle with Guard membership, removed from Nest membership.
+- Builder return points use different Guard angles (45° and 135°). Invalid point locations are projected into Guard. If points are missing, participants use opposite positions at the Guard's middle radius, through `GetSafePosition`.
+- Disabling/cancelling a cycle still clears locks without another charge or Egg. The already-paid Food cost is not refunded. A valid Guard is used for return; if Guard is disabled, assignment safely falls back to unassigned Idle. Invalid Guard configuration cannot start a new cycle.
+
+### Newborn placement
+
+- EggHatch retains its Unit prefab, 4-second timer, one-shot hatch guard, single Population increment and Egg destruction.
+- Added defaultIdleZone and optional newbornSpawnPoint. BreedingSystem injects its scene Guard/spawn references alongside GameState before the Egg starts.
+- The new Unit spawns at the safe Guard position, is unlocked, receives Guard membership and stays Idle. Without a spawn point, the existing relative offset is projected into Guard.
+- The builder uses a newborn point at 225°, separate from both participant return points and the initial four cardinal positions. Placement uses fixed points, not collision avoidance; players can move Units if they later occupy those points.
+- Incubation pauses while Guard is unavailable; it cannot increase Population by spawning an unassigned Unit during that condition.
+- The existing Unit prefab is reused; there are no juvenile states or species-specific capabilities.
+
+### Presentation and builder
+
+Menu remains **Tools > Eggs > Build M1B Prototype**. There is only one formal M1B builder.
+
+- Replaced the three rectangular work zones with Nest Core, Guard Ring, Food A and Food B; no Defense Zone is created.
+- Four initial Unit instances are evenly placed at 0°, 90°, 180° and 270° on the Guard's middle radius, with serialized initial Guard membership.
+- Four LineRenderer outer outlines and colored member-count labels show LOVE NEST, GUARD / IDLE, FOOD A and FOOD B. `RingZoneVisual` is optional presentation, initialized by the builder before saving and refreshed when radius/center changes.
+- The builder creates/reuses a simple material using the installed URP Particles/Unlit shader for vertex-colored lines. No custom shader or mesh system was introduced.
+- Nest, Egg and the two Chinese HUD labels still use existing art with white SpriteRenderer tint. Numeric text, counters and breeding/hatch feedback are reused. Ground and forest are left unconnected in this pass.
+- M1BHud and GameState code are unchanged. The camera/HUD/legend positions were adjusted around the full ring layout; use a landscape 16:9 Game view.
+- Existing dirty-scene protection, rebuild confirmation, prefab reuse and dependency errors remain. Missing art is reported in the Editor; runtime loads no asset paths.
+
+On manual menu execution, the builder creates/rebuilds:
 
 - `Assets/Eggs/Scenes/Eggs_M1B.unity`
-- `Assets/Eggs/Prefabs/Egg_M1B.prefab` (created once, then reused)
+- `Assets/Eggs/Prefabs/Egg_M1B.prefab`
+- `Assets/Eggs/Generated/M1B/RingOutline.mat`
 
-The scene contains one camera, one UnitDragController, one GameState, FoodProductionSystem, BreedingSystem, four initial Unit prefab instances, the three WorkZones, Egg Spawn Point, HUD and debug labels. The initial Unit count comes from the newly created GameState's startingPopulation configuration, default 4. Runtime Population is not inferred from Hierarchy searches.
+**These outputs have not been generated during this pass.** Codex did not run Unity or the builder.
 
-The builder validates existing prefab and Sprite dependencies before creating a fresh scene. Missing or ambiguous Sprites produce an error with the asset path. It supports a single Sprite subasset without modifying import settings. It stops for dirty open scenes, asks before replacing M1B, reuses existing prefabs and saves only its target scene/new Egg prefab. It does not invoke the M1A builder or modify M1A assets, project settings or packages.
+Art Foundation remains established. **Playable population Creature / Unit base visual still needs final confirmation or artwork.** The current Unit placeholder remains in use; archer/guardian art remains reference material.
 
-**The M1B scene and Egg prefab have not been generated by Codex.** The builder has not been run; they will be created when the user executes the menu. Use a landscape 16:9 Game view for the prototype layout. Ground and forest art are not required or connected by this builder.
+## Documentation and M2 Direction
 
-## Actual Static and Offline Verification
+AGENTS now lists only Idle, Gathering and Breeding as formal work states, retaining Defending solely for historical M1A compatibility.
 
-- Offline C# compilation passed for all ten Runtime and four Editor files using the installed Unity Roslyn compiler, Unity reference assemblies and existing Input System DLL. Runtime was compiled separately without UnityEditor references. The normal unused serialized-field warning CS0649 was suppressed.
-- 49 offline logic assertions passed against the actual Runtime source with lightweight Unity API stubs. Checks covered safe economy mutations, current-membership Food ticks, Food scaling, insufficient-Food waiting, one charge per cycle, locked selection filtering, completion cleanup, one Egg at a time, single hatch/population increment, two successive cycles (4 → 5 → 6), normal newborn work assignment, disable cleanup and HUD reads.
-- These logic checks do not execute real Unity lifecycle scheduling, asset import/serialization, physics, mouse input or rendering. They do not establish Unity Play verification. Harness/compiler files remain in ignored `.utmp/m1b/`.
-- Runtime contains no UnityEditor, AssetDatabase, Resources.Load, hard-coded asset paths, population scene scans or old species terminology. No M2 gameplay was introduced.
-- All new scripts/folders have metadata; 73 asset GUIDs were parsed and checked for uniqueness. Existing metadata was retained.
-- Compared against the start-of-pass snapshot: 146 unrelated existing files are byte-identical, including all nine pre-existing art metadata modifications and all protected M1A assets/settings/packages.
-- `git diff --check` passes for this task's tracked changes; new source/metadata files were also checked for trailing whitespace. The whole-worktree check reports 18 pre-existing trailing-space lines in the nine modified art `.meta` files (`customData` and `indices`). Those files were intentionally preserved.
+GAME_SCOPE now records concentric space, active Food Rings and the tradeoff between Gathering, Breeding and remaining Idle defense capacity. It also records the confirmed M2 rules:
 
-## Play Verified
+- Enemies approach from 360° around the Nest, spawning on an outer circle / near screen edges and moving straight toward the center.
+- Enemies do not attack Units; Units have no HP. No NavMesh or pathfinding.
+- There is no Defense Zone or manually assigned Defending work. Idle Units automatically attack the nearest Enemy in range; Gathering and Breeding Units do not attack.
 
-### M1A — Passed before M1B changes
+These are design rules only. Enemy, combat, Nest HP, waves and win/lose remain unimplemented. M2 must wait for M1B Play acceptance.
 
-The user performed the post-rename Unity smoke test and reported:
+## Actual Static / Offline Verification
 
-- The existing `Eggs_M1A` scene opened normally.
-- `Unit 1` through `Unit 4` had no Missing Script.
-- `Unit_M1A` prefab references were valid.
-- Food → Love Nest → Defense → blank-space state transitions worked correctly.
-- WorkZone Member Count was correct.
-- Repeated dragging worked correctly.
-- The Console contained zero new Errors from the terminology update.
-- `Tools > Eggs > Build M1A Prototype` rebuilt successfully.
-- After rebuilding, there was still one Unit prefab and four Unit instances.
-- Post-rename M1A gameplay behavior matched the pre-rename behavior.
+- All 12 Runtime and four Editor source files compile with the installed Unity Roslyn compiler and local Unity/Input System references. Runtime is compiled separately without UnityEditor dependencies. Only ordinary unused serialized-field warning CS0649 is suppressed.
+- 166 offline assertions passed against actual Runtime source with lightweight Unity API stubs. They cover retained economy/lock/single-Egg behavior, legacy enum/Collider compatibility, radial boundaries, genuine overlap rejection, invalid geometry, Idle membership, exclusive ownership, initial assignment, multi-ring totals/de-duplication, resource availability, safe placement, participant return, newborn membership, 4 → 5 → 6 growth and outline point generation.
+- These checks do not run Unity import/serialization, actual lifecycle scheduling, mouse/physics interaction or rendering. They are not Unity Play verification. Harness/compiler files are in ignored `.utmp/m1b-ring/`.
+- Existing M1A scene, prefab, builder and metadata are preserved. GameState, M1BHud, UnitDragController, existing art/generated resources, SampleScene, Packages and ProjectSettings are unchanged.
+- Runtime contains no UnityEditor, AssetDatabase or hard-coded art paths. Formal M1B builder contains no Defense Zone or Defending assignment. No new work state, enemy/combat system or Food refresh system was added.
+- `git diff --check` passes. New source metadata is supplied; existing GUIDs are retained.
 
-This preserves the M1A success record; it does not claim that the new shared interaction-lock code has already received a Unity regression test.
+## Historical Play Verification
 
-### M1B — None / Pending Play Verification
+### M1A — Play Verified before M1B
 
-No Computer Use was used. Codex did not launch/control Unity, run either builder, enter Play or test real mouse input.
+The user's post-rename Unity smoke test passed: the existing Eggs_M1A scene opened normally; Unit 1–4 had no Missing Script; Unit_M1A prefab references were valid; Food → Love Nest → Defense → blank-state changes and member counts worked; repeated dragging worked; the Console had zero new Errors; the M1A builder rebuilt successfully with one Unit prefab and four instances; gameplay matched the pre-rename behavior.
 
-## Pending Manual Verification
+This is a historical result. The shared WorkZone extension and optional Unit startup assignment need the brief M1A regression below; no new Unity result is claimed.
 
-| Check | Action and required result |
-| --- | --- |
-| A. Build | Let Unity import/compile with zero compile Errors. Save/close dirty scenes, then run `Tools > Eggs > Build M1B Prototype`. Confirm the M1B scene and Egg prefab are generated with valid references. |
-| B. Initial | Enter Play: Population = 4, Food = 10; all four Units are draggable. Inspect the two GameState runtime values and the HUD. |
-| C. Gathering | Drop one Unit into Food: Gathering, Food increases about once per second. After roughly three seconds, drag it away: further growth stops. |
-| D. Scaling | Assign two Units to Food: growth is about twice the one-Unit rate. Drag either away and confirm the next tick uses the new count. |
-| E. Breeding | With Food >= 5, drop two Units into Love Nest. Food drops by exactly 5 once; both Units lock and cannot be dragged; the countdown lasts about five seconds. To inspect the debit clearly, move other Units out of Food first. No repeated breeding charge occurs while waiting. |
-| F. Egg | Completion creates exactly one Egg. Both participating Units unlock, become Idle and leave the Nest member list. They are draggable again. Population is still 4. Leaving them physically inside the Nest must not automatically reassign them. |
-| G. Hatch | About four seconds later, the Egg disappears, exactly one new Unit appears near the Nest, and Population changes 4 → 5 once. |
-| H. New Unit | Drag the new Unit into Food → Gathering, Love Nest → Breeding, Defense → Defending, blank space → Idle. Check membership as well as labels; it has the same normal Unit components. |
-| I. Insufficient Food | Before a separate Play run, set GameState startingFood to 0, keeping startingPopulation at 4. With two Units in the Nest: no debit, timer, lock or Egg. Use another Unit to gather; once Food reaches 5, one cycle starts automatically. Restore startingFood = 10 after this check. |
-| J. Repeat | Complete a second Breed → Egg → Hatch cycle by dropping Units into the Nest again. Population changes 5 → 6. No double hatch, duplicate debit, stuck lock or unexpected additional Egg. |
-| K. Console | The full flow produces zero new Errors from M1B. Check formal-art colors, both Chinese HUD labels, numeric text and countdown readability. |
+### M1B — None / Pending Unity Play Verification
 
-Additional regression checks:
+The rectangular implementation was never Play Verified and is superseded. Only the ring layout is the current M1B acceptance target.
 
-- While an Egg exists, drop two other Units into the Nest with enough Food. They remain unlocked without a new charge; the next cycle may start only after the Egg hatches.
-- In a temporary test copy, disable BreedingSystem or its GameObject mid-cycle. Both participants must be unlocked and Idle, with no later Egg from that cancelled cycle. Re-enable it and confirm fresh drops can start a new cycle. Also check disabling a participant or the Nest clears remaining locks by the next update.
-- Disable/re-enable EggHatch during incubation: it pauses/resumes and never duplicates a hatch. Re-enable BreedingSystem while that Egg remains: the occupied slot must still block a new cycle.
-- Exit Play, rebuild M1B, then save/reopen. Confirm one Egg prefab, four initial Units and one instance of each economy system; check rebuild Cancel and dirty-scene protection. Customized scene changes should be saved in a separate copy before rebuilding.
-- Open the untouched M1A scene and do a short drag/state/member-count regression with the shared updated scripts. Its Units should remain unlocked unless explicitly locked by a system.
+## Pending Manual Acceptance
 
-## Files Created / Modified
+1. Allow Unity to import and compile: zero compile Errors. Save/close dirty scenes, then run **Tools > Eggs > Build M1B Prototype**.
+2. Confirm central Love Nest and the three surrounding rings, four visible outlines/labels, no rectangular work zones and no Defense Zone.
+3. Enter Play: Food = 10, Population = 4; four Units are evenly arranged in Guard, each Idle with CurrentZone = Guard Ring. Guard Member Count = 4; other counts = 0.
+4. Drag Guard → Food A: Gathering. Drag A → B: Gathering, CurrentZone = B, and A loses that member. Drag Food → Guard: Idle with Guard membership. Drag Guard → Nest: Breeding. Outside every ring: Idle with no zone.
+5. One Gathering Unit yields approximately +1 Food/second. Two Units split across Food A/B yield approximately +2/second. Pickup removes the old member's contribution from the next tick.
+6. With Food >= 5, drop two Units in Nest. Exactly 5 Food is charged once and both Units lock. After about 5 seconds, exactly one Egg appears; both participants unlock, return to distinct Guard positions and become Idle members. Nest count clears. Population remains 4.
+7. After about 4 seconds, the Egg disappears, Population changes 4 → 5 once, and the newborn is unlocked, Idle and inside Guard with Guard membership. Drag it to Food, Nest and Guard normally.
+8. Repeat by dropping two Units into Nest again: Population 5 → 6. No repeat charge, duplicate Egg/hatch, stale membership or stuck lock. Units standing in Guard never automatically re-enter breeding.
+9. During an Egg's incubation, further Nest assignments must not trigger a new cycle or charge. A new cycle may begin after hatching if two members remain assigned and Food is sufficient.
+10. Test insufficient Food in a separate run with startingFood = 0: two Nest members remain unlocked with no charge/timer/Egg. Gathering to 5 allows one cycle. Restore startingFood = 10 afterward.
+11. In a temporary scene copy, remove optional participant return/newborn points: all placements must still be inside Guard, not Nest. Try invalid point locations and confirm clamping. Check disabling BreedingSystem or a participant clears locks; disabling Guard prevents new breeding/hatching until available again.
+12. Check exact/near shared boundaries for no normal overlap warning; intentionally overlapping rings should still warn and reject assignment. Verify visual outlines and ring geometry agree.
+13. Exit Play, rebuild, save/reopen: one M1B scene, one Egg prefab, four initial Units and one economy system of each type. Check Cancel/dirty-scene protection and preserved references.
+14. Open the unchanged M1A scene and check its original Collider zones, including Defending, plus single-Unit drag and membership changes.
+15. Full flow: zero new Console Errors; inspect HUD, ring labels, count accuracy and countdown readability.
 
-New Runtime source (each with `.meta`):
+## Files Changed
 
-- `Assets/Eggs/Scripts/Core/GameState.cs`
+Modified Runtime:
+
+- `Assets/Eggs/Scripts/Core/UnitWorkState.cs`
+- `Assets/Eggs/Scripts/Core/UnitActor.cs`
+- `Assets/Eggs/Scripts/World/WorkZone.cs`
 - `Assets/Eggs/Scripts/Gameplay/FoodProductionSystem.cs`
 - `Assets/Eggs/Scripts/Gameplay/BreedingSystem.cs`
 - `Assets/Eggs/Scripts/Gameplay/EggHatch.cs`
-- `Assets/Eggs/Scripts/UI/M1BHud.cs`
-- New `Gameplay.meta` and `UI.meta` folder metadata.
 
-Modified Runtime source:
+New Runtime/presentation files, each with metadata:
 
-- `Assets/Eggs/Scripts/Core/UnitActor.cs`
-- `Assets/Eggs/Scripts/Interaction/UnitDragController.cs`
+- `Assets/Eggs/Scripts/World/WorkZoneShape.cs`
+- `Assets/Eggs/Scripts/World/RingZoneVisual.cs`
 
-Editor source:
+Modified Editor/documentation:
 
-- New `Assets/Eggs/Editor/M1BPrototypeBuilder.cs` and `.meta`.
-- New `Assets/Eggs/Editor/M1BDebugInspectors.cs` and `.meta`.
-- Modified `Assets/Eggs/Editor/M1ADebugInspectors.cs` to display Interaction Locked.
+- `Assets/Eggs/Editor/M1BPrototypeBuilder.cs`
+- `AGENTS.md`
+- `docs/GAME_SCOPE.md`
+- `docs/HANDOFF.md`
 
-Documentation:
+## Next
 
-- Updated `docs/HANDOFF.md` only. Existing design/art documents were read and preserved.
+Run and record the manual ring-layout M1B acceptance flow. Fix any issues before acceptance. Do not start M2 before M1B passes.
 
-## History and Next
-
-The earlier [historical handoff](history/HANDOFF_BEFORE_UNIT_RENAME.md) preserves pre-Unit migration records and historical names. Current runtime terminology remains Unit / Creature.
-
-Next: the user performs and records the M1B manual Unity acceptance flow above. Fix any M1B issues before acceptance. **M2 is allowed only after M1B Play verification passes; M2 has not started.** Defending remains a work state only. No enemy, Nest HP, combat, wave, win/lose, Unit death, training or career system was added.
-
-Git continues to warn that it cannot read `C:/Users/95799/.config/git/ignore`; repository status is readable and Git configuration was not changed.
+Git still warns that it cannot read `C:/Users/95799/.config/git/ignore`; status is readable and Git configuration was not changed.
 
 No Computer Use, Unity launch/control, branch change, merge, reset, stash, commit or push was performed.

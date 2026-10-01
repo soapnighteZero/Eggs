@@ -6,7 +6,7 @@ Regrowth
 
 ## One Sentence
 
-玩家拖拽仅存的小角色去采集、繁殖和防守，在敌人不断攻击爱巢的压力下孵化新的小角色，让濒危种群重新恢复。
+玩家围绕爱巢分配仅存的小角色去采集、繁殖，并留下 Idle 个体自动防守，在敌人攻击爱巢的压力下孵化新的小角色，让濒危种群重新恢复。
 
 ## Theme Expression
 
@@ -36,7 +36,7 @@ Regrowth 必须直接发生在核心玩法中。
 
 ## Core Player Decision
 
-同一批有限的小角色必须在三个需求之间重新分配：
+有限 Population 必须在 Gathering、Breeding 与剩余 Idle 防守能力之间权衡：
 
 ### Gathering
 生产 Food。
@@ -44,8 +44,9 @@ Regrowth 必须直接发生在核心玩法中。
 ### Breeding
 暂时占用个体，消耗 Food，产生 Egg，并最终增加 Population。
 
-### Defending
-放弃当前采集 / 繁殖效率，保护 Love Nest。
+### Remaining Idle Defense Capacity
+Idle 小角色是 M2 自动防守人口；不需要分配到 Defense Zone 或手动切换防守工作。
+Gathering 与 Breeding 小角色不参与自动防守。
 
 核心冲突：
 
@@ -56,18 +57,18 @@ vs
 如果把太多小角色用于繁殖：
 当前防守变弱。
 
-如果把太多小角色用于防守：
+如果保留太多 Idle 小角色用于防守：
 Food 与 Population 增长变慢。
 
 ---
 
 ## Core Loop
 
-拖拽分配小角色
+拖拽小角色到当前有资源的 Food Rings
 
 → Gathering 产生 Food
 
-→ 两个小角色进入 Love Nest
+→ 将两个小角色带回中心 Love Nest / Nest Core
 
 → 消耗 Food 开始繁殖
 
@@ -77,9 +78,9 @@ Food 与 Population 增长变慢。
 
 → Population 增长
 
-→ 敌人来袭
+→ M2 敌人从四面八方接近
 
-→ 玩家把小角色重新调到 Defense
+→ 剩余 Idle 小角色自动防守
 
 → 守住 Love Nest
 
@@ -93,25 +94,39 @@ Food 与 Population 增长变慢。
 
 场景包含：
 
-### Love Nest
-- 位于场景中心或视觉核心位置
+### 中心：Love Nest / Nest Core
+- 位于世界中心附近
+- 圆盘区域，半径默认 0–1.1 world units
+- WorkZone TargetState = Breeding
 - 是繁殖区域
 - Egg 出现在这里
 - 后续也是必须保护的核心
 
-### Food Zone
-- 小角色进入后成为 Gathering
-- 持续生产 Food
+### 第一圈：Guard / Standby Ring
+- 默认半径 1.1–2.5
+- 真实 WorkZone，TargetState = Idle；有成员归属，但不是职业或防守工作状态
+- 初始小角色、繁殖结束的小角色和新生小角色均放在此圈
+- M1B 不攻击敌人；M2 才让 Idle 小角色自动攻击
 
-### Defense Zone
-- 小角色进入后成为 Defending
-- M1 只需要完成状态分配
-- M2 才真正攻击敌人
+### 外圈：Food Rings
+- Food Ring A 默认半径 2.5–3.7；Food Ring B 默认半径 3.7–4.9
+- 两者 TargetState = Gathering，产粮按当前有效、有资源区域的成员总数计算
+- 半径可在 WorkZone Inspector / Builder 中调整；必须保持相邻边界一致且区域不重叠
+- 共用边界只归属外侧区域，最外侧边界归属 Food Ring B，避免重叠或缝隙
 
-### Enemy Entry
-- M2 才启用
-- 敌人从屏幕边缘进入
-- 只向 Love Nest 移动
+### 未来外围：Enemy Approach Area
+- M2 才启用，从 Nest 周围 360° 的外围圆或屏幕边缘附近进入
+- 直线向 Love Nest 中心移动，不使用 NavMesh / pathfinding
+
+拖到所有有效区域之外：CurrentZone = null、CurrentState = Idle。
+这类 Idle 小角色在 M2 同样具备自动防守资格。
+
+### Food Ring 资源刷新方向
+
+后续部分 Food Ring 会出现或失去可采集资源，玩家需要按当前有资源的圆环重新分配。
+每个 Food Ring 可独立标记 resource available / unavailable，不改变 Unit 唯一区域归属或 GameState 的 Food 所有权。
+当前 M1B 中 A/B 均先设为有资源；unavailable 只停止该圈产粮，不自动移动成员或改写工作状态。
+本轮不实现随机刷新、耗尽、容量、重生计时或拾取动画。
 
 不做地图探索。
 
@@ -135,7 +150,7 @@ Food 与 Population 增长变慢。
 
 初始：
 
-- 4 个小角色
+- 4 个小角色，初始均匀分布在 Guard Ring，Idle 且归属 Guard Ring
 - 一定初始 Food
 
 每个小角色支持：
@@ -144,15 +159,15 @@ Food 与 Population 增长变慢。
 - Idle
 - Gathering
 - Breeding
-- Defending
 
-M1 中 Defending 只需要正确保存工作状态，
-不需要战斗。
+当前正式玩法不使用 Defending。`Defending = 3` 仅为已验证的历史 M1A
+Scene / Builder 保留；M1A 原三矩形布局不代表正式 M1B/M2 空间设计。
 
-Food Zone：
+Food Rings：
 
 - Gathering 小角色持续产生 Food
 - 拖走后立即停止产生 Food
+- 每次 tick 合计所有有效、有资源 Food Ring 的当前成员数，重复区域引用不得重复计数
 
 Love Nest：
 
@@ -161,6 +176,9 @@ Love Nest：
 - 一次繁殖只消耗一次 Food
 - 参与繁殖的两个小角色暂时不能承担其他工作
 - 繁殖经过时间后产生一个 Egg
+- M1B 默认消耗 5 Food、持续 5 秒；一次仅一个繁殖周期或未孵化 Egg
+- 完成后两位参与者解锁、退出 Nest 并瞬移回 Guard Ring，状态 Idle
+- 必须再次拖入 Nest 才能参与下一轮
 
 Egg：
 
@@ -169,6 +187,7 @@ Egg：
 - Population +1
 - 新生小角色和初始小角色使用同一套核心逻辑
 - 新生小角色也可继续拖拽和重新分配
+- M1B 默认孵化 4 秒，新生小角色出现在 Guard Ring，Idle、未锁定且归属 Guard Ring
 
 Minimum HUD：
 
@@ -187,6 +206,7 @@ Minimum HUD：
 → Egg appears
 → Egg hatches
 → Population becomes 5
+→ newborn Unit starts Idle in Guard Ring and can be reassigned
 
 ## M1 Gate
 
@@ -216,15 +236,20 @@ Love Nest:
 
 Enemy:
 
-- 从屏幕边缘生成
-- 只向 Love Nest 移动
+- 从 Nest 周围 360° 任意方向的外围圆 / 屏幕边缘附近生成
+- 直线向 Love Nest 中心移动
 - 到达 Nest 后攻击 Nest
-- 可以被 Defending 小角色杀死
+- 不攻击小角色；可以被 Idle 小角色击败
 
-Defending Unit:
+Automatic Defense:
 
-- 自动攻击进入防守范围的敌人
+- 不存在 Defense Zone，也不让玩家手动指定 Defending 工作
+- 所有 CurrentState == Idle 的小角色自动参与防守，包括 Guard Ring 成员和区域外 Idle
+- 自动攻击进入攻击范围的最近 Enemy
+- Gathering 与 Breeding 小角色不攻击
 - 不需要玩家逐个指定敌人
+
+以上为已确认的 M2 设计。本轮仅更新文档，不实现 Enemy、攻击或战斗。
 
 ## Hard Simplifications
 
@@ -244,7 +269,7 @@ Defending Unit:
 
 Defense 的决策核心仍然是：
 
-“我要分多少个小角色回来保护 Love Nest？”
+“我要保留多少 Idle 小角色保护 Love Nest，又投入多少小角色采集和繁殖？”
 
 ---
 

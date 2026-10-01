@@ -17,6 +17,11 @@ namespace Eggs.Editor
         private const string UnitPath = "Assets/Eggs/Prefabs/Unit_M1A.prefab";
         private const string EggPath = "Assets/Eggs/Prefabs/Egg_M1B.prefab";
         private const string ArtRoot = "Assets/Eggs/Art/";
+        // Builder defaults. Generated WorkZone radii remain editable in the Inspector.
+        private const float NestRadius = 1.1f;
+        private const float GuardRadius = 2.5f;
+        private const float FoodARadius = 3.7f;
+        private const float FoodBRadius = 4.9f;
 
         [MenuItem(MenuPath)]
         public static void Build()
@@ -43,6 +48,9 @@ namespace Eggs.Editor
 
             try
             {
+                if (!(NestRadius > 0f && GuardRadius > NestRadius && FoodARadius > GuardRadius
+                    && FoodBRadius > FoodARadius && !float.IsInfinity(FoodBRadius)))
+                    throw new InvalidOperationException("Ring radii must increase from Nest to Food B.");
                 // Resolve every existing dependency before replacing the open scene.
                 UnitActor unitPrefab = RequireUnitPrefab();
                 Sprite square = RequireSprite("Assets/Eggs/Generated/M1A/Square.png");
@@ -57,6 +65,7 @@ namespace Eggs.Editor
 
                 EnsureFolder("Assets/Eggs/Scenes");
                 EnsureFolder("Assets/Eggs/Prefabs");
+                Material lineMaterial = GetOrCreateLineMaterial();
                 EggHatch eggPrefab = GetOrCreateEggPrefab(unitPrefab, eggSprite, material, font);
 
                 Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -66,24 +75,36 @@ namespace Eggs.Editor
                 int initialPopulation = stateData.FindProperty("startingPopulation").intValue;
                 int initialFood = stateData.FindProperty("startingFood").intValue;
 
+                Transform center = new GameObject("Love Nest Center").transform;
+                center.position = Vector3.zero;
                 WorkZone[] zones =
                 {
-                    CreateZone("Food Zone", "FOOD", UnitWorkState.Gathering, -5.8f,
-                        new Color(0.24f, 0.72f, 0.40f, 0.55f), square, material, font),
-                    CreateZone("Love Nest Zone", "LOVE NEST", UnitWorkState.Breeding, 0f,
-                        new Color(0.86f, 0.38f, 0.54f, 0.30f), square, material, font),
-                    CreateZone("Defense Zone", "DEFENSE", UnitWorkState.Defending, 5.8f,
-                        new Color(0.28f, 0.52f, 0.90f, 0.55f), square, material, font)
+                    CreateRing("Nest Core", "LOVE NEST", UnitWorkState.Breeding, center,
+                        0f, NestRadius, false, new Vector3(7f, 3.2f, 0f),
+                        new Color(1f, 0.52f, 0.7f), lineMaterial, font),
+                    CreateRing("Guard Ring", "GUARD / IDLE", UnitWorkState.Idle, center,
+                        NestRadius, GuardRadius, false, new Vector3(7f, 1.4f, 0f),
+                        new Color(0.4f, 0.75f, 1f), lineMaterial, font),
+                    CreateRing("Food Ring A", "FOOD A", UnitWorkState.Gathering, center,
+                        GuardRadius, FoodARadius, false, new Vector3(7f, -0.4f, 0f),
+                        new Color(0.4f, 0.95f, 0.5f), lineMaterial, font),
+                    CreateRing("Food Ring B", "FOOD B", UnitWorkState.Gathering, center,
+                        FoodARadius, FoodBRadius, true, new Vector3(7f, -2.2f, 0f),
+                        new Color(1f, 0.84f, 0.35f), lineMaterial, font)
                 };
-                SpriteRenderer nest = CreateSprite("Nest Visual", zones[1].transform, Vector3.zero,
+                WorkZone guard = zones[1];
+                SpriteRenderer nest = CreateSprite("Nest Visual", center, Vector3.zero,
                     nestSprite, material, -8);
-                nest.transform.localScale = Vector3.one * 1.25f;
+                nest.transform.localScale = Vector3.one * (NestRadius * 2f / nestSprite.bounds.size.x);
 
                 for (int i = 0; i < initialPopulation; i++)
                 {
                     GameObject unit = (GameObject)PrefabUtility.InstantiatePrefab(unitPrefab.gameObject, scene);
                     unit.name = $"Unit {i + 1}";
-                    unit.transform.position = new Vector3(-3.6f + i * 2.4f, -3.7f, 0f);
+                    unit.transform.position = GuardPosition(guard, i * (360f / initialPopulation));
+                    UnitActor actor = unit.GetComponent<UnitActor>();
+                    Configure(actor, data => data.FindProperty("initialZone").objectReferenceValue = guard);
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(actor);
                     TextMesh label = unit.GetComponentInChildren<TextMesh>();
                     if (label != null)
                     {
@@ -108,28 +129,39 @@ namespace Eggs.Editor
                 Configure(food, data =>
                 {
                     data.FindProperty("gameState").objectReferenceValue = state;
-                    data.FindProperty("foodZone").objectReferenceValue = zones[0];
+                    SerializedProperty foodZones = data.FindProperty("foodZones");
+                    foodZones.arraySize = 2;
+                    foodZones.GetArrayElementAtIndex(0).objectReferenceValue = zones[2];
+                    foodZones.GetArrayElementAtIndex(1).objectReferenceValue = zones[3];
                 });
 
                 Transform spawn = new GameObject("Egg Spawn Point").transform;
-                spawn.position = new Vector3(0f, 0.5f, 0f);
-                TextMesh status = CreateLabel("Breeding Status", null, new Vector3(0f, -1.65f, 0f),
+                spawn.SetParent(center, false);
+                Transform returnA = CreatePoint("Post Breed Return A", center, GuardPosition(guard, 45f));
+                Transform returnB = CreatePoint("Post Breed Return B", center, GuardPosition(guard, 135f));
+                Transform newborn = CreatePoint("Newborn Spawn Point", center, GuardPosition(guard, 225f));
+                TextMesh status = CreateLabel("Breeding Status", null, new Vector3(-7f, 0f, 0f),
                     "DROP 2 UNITS TO BREED", font, 0.06f);
                 BreedingSystem breeding = new GameObject("Breeding System").AddComponent<BreedingSystem>();
                 Configure(breeding, data =>
                 {
                     data.FindProperty("gameState").objectReferenceValue = state;
-                    data.FindProperty("loveNestZone").objectReferenceValue = zones[1];
+                    data.FindProperty("loveNestZone").objectReferenceValue = zones[0];
+                    data.FindProperty("standbyZone").objectReferenceValue = guard;
+                    data.FindProperty("postBreedReturnPointA").objectReferenceValue = returnA;
+                    data.FindProperty("postBreedReturnPointB").objectReferenceValue = returnB;
+                    data.FindProperty("newbornSpawnPoint").objectReferenceValue = newborn;
                     data.FindProperty("eggPrefab").objectReferenceValue = eggPrefab;
                     data.FindProperty("eggSpawnPoint").objectReferenceValue = spawn;
                     data.FindProperty("statusLabel").objectReferenceValue = status;
                 });
 
                 CreateHud(state, foodSprite, populationSprite, initialFood, initialPopulation, square, material, font);
-                CreateLabel("Instructions", null, new Vector3(0f, 4f, 0f),
-                    "M1B - Gather Food > Breed > Egg > Grow", font, 0.075f);
-                CreateLabel("Idle Hint", null, new Vector3(0f, -5.1f, 0f),
-                    "Pick up = Idle   |   Breeding locks 2 units   |   Drop again for another cycle", font, 0.052f);
+                CreateLabel("Instructions", null, new Vector3(0f, -5.65f, 0f),
+                    "M1B - Food rings > Central Nest > Egg > Population", font, 0.075f);
+                CreateLabel("Idle Hint", null, new Vector3(0f, -6.25f, 0f),
+                    "Guard = Idle   |   Nest locks 2 units   |   Outside rings = unassigned Idle", font, 0.052f);
+                CreateLabel("Ring Legend", null, new Vector3(7f, 4.5f, 0f), "INNER > OUTER", font, 0.055f);
 
                 if (!EditorSceneManager.SaveScene(scene, ScenePath))
                     throw new IOException("Could not save " + ScenePath);
@@ -155,7 +187,7 @@ namespace Eggs.Editor
             Camera camera = root.GetComponent<Camera>();
             camera.transform.position = new Vector3(0f, 0f, -10f);
             camera.orthographic = true;
-            camera.orthographicSize = 6f;
+            camera.orthographicSize = Mathf.Max(6.8f, FoodBRadius + 1.9f);
             camera.nearClipPlane = 0.1f;
             camera.farClipPlane = 100f;
             camera.clearFlags = CameraClearFlags.SolidColor;
@@ -164,27 +196,45 @@ namespace Eggs.Editor
             return camera;
         }
 
-        private static WorkZone CreateZone(string name, string heading, UnitWorkState state, float x,
-            Color color, Sprite square, Material material, Font font)
+        private static WorkZone CreateRing(string name, string heading, UnitWorkState state, Transform center,
+            float inner, float outer, bool includeOuter, Vector3 labelPosition, Color color, Material material, Font font)
         {
             GameObject root = new GameObject(name);
-            root.transform.position = new Vector3(x, 0.5f, 0f);
-            BoxCollider2D area = root.AddComponent<BoxCollider2D>();
-            area.size = new Vector2(4.6f, 3.6f);
-            area.isTrigger = true;
+            root.transform.SetParent(center, false);
             WorkZone zone = root.AddComponent<WorkZone>();
             Configure(zone, data =>
             {
+                data.FindProperty("shape").enumValueIndex = (int)WorkZoneShape.Ring;
                 data.FindProperty("targetState").enumValueIndex = (int)state;
-                data.FindProperty("dropArea").objectReferenceValue = area;
+                data.FindProperty("ringCenter").objectReferenceValue = center;
+                data.FindProperty("innerRadius").floatValue = inner;
+                data.FindProperty("outerRadius").floatValue = outer;
+                data.FindProperty("includeOuterBoundary").boolValue = includeOuter;
+                data.FindProperty("acceptUnits").boolValue = true;
+                data.FindProperty("resourceAvailable").boolValue = true;
                 data.FindProperty("gizmoColor").colorValue = color;
             });
 
-            SpriteRenderer visual = CreateSprite("Zone Area", root.transform, Vector3.zero, square, material, -10);
-            visual.transform.localScale = new Vector3(4.6f, 3.6f, 1f);
-            visual.color = color;
-            TextMesh label = CreateLabel("Zone Label", root.transform, new Vector3(0f, 2.55f, 0f),
+            // One outer outline per concentric zone; adjacent zones share the same seam.
+            LineRenderer line = new GameObject("Ring Outline").AddComponent<LineRenderer>();
+            line.transform.SetParent(root.transform, false);
+            line.sharedMaterial = material;
+            line.startColor = color;
+            line.endColor = color;
+            line.widthMultiplier = 0.035f;
+            line.sortingOrder = -5;
+            line.shadowCastingMode = ShadowCastingMode.Off;
+            line.receiveShadows = false;
+            RingZoneVisual visual = root.AddComponent<RingZoneVisual>();
+            Configure(visual, data =>
+            {
+                data.FindProperty("zone").objectReferenceValue = zone;
+                data.FindProperty("outline").objectReferenceValue = line;
+            });
+            visual.Refresh();
+            TextMesh label = CreateLabel("Zone Label", root.transform, labelPosition,
                 heading + "\nMembers: 0", font, 0.075f);
+            label.color = color;
             Configure(root.AddComponent<M1ADebugLabel>(), data =>
             {
                 data.FindProperty("label").objectReferenceValue = label;
@@ -194,10 +244,26 @@ namespace Eggs.Editor
             return zone;
         }
 
+        private static Vector3 GuardPosition(WorkZone guard, float degrees)
+        {
+            float angle = degrees * Mathf.Deg2Rad;
+            float radius = (guard.InnerRadius + guard.OuterRadius) * 0.5f;
+            return guard.RingCenter.position + new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * radius;
+        }
+
+        private static Transform CreatePoint(string name, Transform parent, Vector3 position)
+        {
+            Transform point = new GameObject(name).transform;
+            point.SetParent(parent, false);
+            point.position = position;
+            return point;
+        }
+
         private static void CreateHud(GameState state, Sprite food, Sprite population, int initialFood,
             int initialPopulation, Sprite square, Material material, Font font)
         {
             GameObject root = new GameObject("HUD");
+            root.transform.position = new Vector3(0f, 0.95f, 0f);
             SpriteRenderer panel = CreateSprite("HUD Background", root.transform, new Vector3(0f, 5f, 0f),
                 square, material, 25);
             panel.transform.localScale = new Vector3(17.6f, 1.3f, 1f);
@@ -267,6 +333,36 @@ namespace Eggs.Editor
                 throw new InvalidOperationException("Unit prefab needs active UnitActor, Collider2D, SpriteRenderer "
                     + "and SortingGroup: " + UnitPath);
             return unit;
+        }
+
+        private static Material GetOrCreateLineMaterial()
+        {
+            const string path = "Assets/Eggs/Generated/M1B/RingOutline.mat";
+            Material existing = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (existing != null)
+                return existing;
+            if (File.Exists(path))
+                throw new InvalidOperationException("Cannot read existing ring outline material: " + path);
+
+            // LineRenderer needs a vertex-color shader without SpriteRenderer-only properties.
+            Shader shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+            if (shader == null)
+                throw new InvalidOperationException("Missing installed URP Particles/Unlit shader for ring outlines.");
+            EnsureFolder("Assets/Eggs/Generated/M1B");
+            Material material = new Material(shader);
+            material.SetFloat("_Surface", 1f);
+            material.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha);
+            material.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
+            material.SetFloat("_SrcBlendAlpha", (float)BlendMode.One);
+            material.SetFloat("_DstBlendAlpha", (float)BlendMode.OneMinusSrcAlpha);
+            material.SetFloat("_ZWrite", 0f);
+            material.SetFloat("_Cull", (float)CullMode.Off);
+            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            material.SetOverrideTag("RenderType", "Transparent");
+            material.renderQueue = (int)RenderQueue.Transparent;
+            AssetDatabase.CreateAsset(material, path);
+            AssetDatabase.SaveAssetIfDirty(material);
+            return material;
         }
 
         private static T RequireAsset<T>(string path) where T : Object
