@@ -6,12 +6,12 @@ M1A - Drag and Work Zones. M1B has not started.
 
 ## Status
 
-Terminology & Art Foundation Update completed at the file level.
+Terminology & Art Foundation Update completed. Art Foundation is established.
 
 M1A previously Play-verified before terminology rename.
-Post-rename Unity compile / Play smoke check pending.
+Post-rename Unity smoke test passed. M1A has been re-verified under Unit terminology, with gameplay behavior unchanged from before the rename.
 
-The pre-rename Play result was reported by the user in this update request. This pass used code, files and terminal commands only; it did not run Unity import, compilation, the builder or Play. The successful offline C# checks below do not replace those Unity checks.
+Both the pre-rename Play result and the completed post-rename Unity smoke test were reported by the user. The manual results are recorded below. Codex only updated this handoff to record the results; it did not run or control Unity. M1B has not started.
 
 ## Terminology & Art Foundation Update (2026-10-01)
 
@@ -45,13 +45,17 @@ The old names in this table describe the migration only. They are not current te
 
 ### Art integration
 
+**Art Foundation established:** Runtime uses generic Unit terminology, character identity belongs to Creature presentation, and prefab/Inspector references allow artwork to be replaced independently of gameplay code. No specific species is required.
+
 The current prefab keeps `UnitActor`, `CircleCollider2D`, `SpriteRenderer`, `SortingGroup` and `M1ADebugLabel` on its root, with a TextMesh State Label child. Its SpriteRenderer sprite and material can already be changed through the Prefab/Inspector. There is no Animator dependency in gameplay code; artists can add/configure one in the prefab when animations are available. No visual hierarchy refactor was needed.
 
 Final Creature identity belongs to presentation. Replacing a sprite or configuring an Animator must not require changes to `UnitActor`. Placeholder circles remain debug visuals. All playable population Units still share the same gameplay rules.
 
-Existing art preparation remains available: nine production PNGs under `Assets/Eggs/Art/`, eight reference PNGs under `docs/art/reference/`, an overview, the source layout preview and a layer manifest. The original PSD and all exported image files/importer metadata were preserved. The ordinary Creature visual still needs to be drawn; the archer and guardian remain references. See [ART_ASSETS.md](ART_ASSETS.md) for the full missing-art list and import notes. No art was newly connected to the scene in this terminology update.
+Existing art preparation remains available: nine production PNGs under `Assets/Eggs/Art/`, eight reference PNGs under `docs/art/reference/`, an overview, the source layout preview and a layer manifest. The original PSD and all exported image files/importer metadata were preserved. The archer and guardian remain references. See [ART_ASSETS.md](ART_ASSETS.md) for the exported-art inventory and import notes. No art was newly connected to the scene in this terminology update.
 
-## Actual Verification
+Current art todo: **Playable population Creature / Unit base visual still needs final confirmation or artwork.** No specific species is required.
+
+## Static Verification During Terminology Migration
 
 - Branch: `Dada`. HEAD: `1e947b6c090e3739646f80edb60820f4ef4e4c0e`. Unity version: `6000.6.3f1`.
 - Offline C# compilation passed for five Runtime files and two Editor files using the installed Unity Roslyn compiler, Unity reference assemblies and local Input System assembly. Runtime was compiled separately without UnityEditor references. Only the normal unused serialized-field warning CS0649 was suppressed.
@@ -62,21 +66,26 @@ Existing art preparation remains available: nine production PNGs under `Assets/E
 - Current `Assets/Eggs` source and assets contain no old species terminology. Current GAME_SCOPE, README and ART_ASSETS contain none either. Retained occurrences elsewhere are the explicitly historical rename mapping/archive, the manifest's historical user decision, and AGENTS' required prohibition against assuming a species.
 - Ignored Unity-generated IDE/cache files can still contain old source paths until Unity refreshes them. They were not hand-edited and are not the current source of truth.
 
-**Post-rename actual Unity compile / Play: pending.** Visual rendering, Unity asset import and the builder have not been executed in this pass.
+## Post-rename Manual Unity Smoke Test — Passed
 
-## Pending Manual Verification
+The user performed the real Unity smoke test and reported these results:
 
-Verify the migrated existing scene before rebuilding it, so rebuilding cannot hide a migration problem.
+- The existing `Eggs_M1A` scene opened normally.
+- `Unit 1` through `Unit 4` had no Missing Script.
+- `Unit_M1A` prefab references were valid.
+- Food → Love Nest → Defense → blank-space state transitions worked correctly.
+- WorkZone Member Count was correct.
+- Repeated dragging worked correctly.
+- The Console contained zero new Errors from this update.
+- `Tools > Eggs > Build M1A Prototype` rebuilt successfully.
+- After rebuilding, there was still one Unit prefab and four Unit instances.
+- Post-rename M1A gameplay behavior matched the pre-rename behavior.
 
-1. Open the project in Unity `6000.6.3f1`, allow import/compile to finish and check the Console. Open `Assets/Eggs/Scenes/Eggs_M1A.unity` directly.
-2. Confirm no Missing Script, exactly four Units, one Unit Drag Controller and three zones. Inspect `UnitActor`, label Unit references, the controller's Unit Layers and its three zone references. Verify the four instances reference `Unit_M1A.prefab`.
-3. Enter Play. Initially all four Units must be Idle with zero zone members. Move Unit 1 through Food → Love Nest → Defense → blank space: Gathering → Breeding → Defending → Idle. Pickup must immediately remove its old membership; it must never belong to two zones.
-4. Assign the other Units independently. Move one Unit between zones at least ten times, drag through/overlap another Unit and click blank space. Confirm single-Unit drag, no duplicate or stale membership, no stuck drag and no new Console errors. Check both labels and the UnitActor/WorkZone Inspectors.
-5. While dragging, release outside the Game view or switch focus. The Unit must be Idle with no zone membership and remain draggable. If checking overlapping zones, use a temporary scene copy and expect a warning with rejected assignment.
-6. Exit Play. Save a separate copy before rebuilding any customized scene. Run `Tools > Eggs > Build M1A Prototype` and confirm rebuilding. Check that only `Unit_M1A.prefab` is used, with exactly four Unit instances, three zones, one camera and one controller. Save/reopen and recheck references, labels and input. The rebuild Cancel action and dirty-scene guard should preserve unsaved work.
-7. Record the actual post-rename Unity compile and Play results here. Do not start M1B as part of this update.
+**M1A is re-verified under Unit terminology.** The post-rename smoke test is complete. Art Foundation is established; the base visual remains the art todo above. M1B has not started.
 
-## Files Changed in This Update
+This follow-up changed only `docs/HANDOFF.md` to record the user's results. No gameplay or asset changes were made by Codex in this follow-up.
+
+## Files Changed in the Terminology Migration
 
 ### Runtime
 
@@ -101,18 +110,18 @@ Verify the migrated existing scene before rebuilding it, so rebuilding cannot hi
 
 - `AGENTS.md`: current Unit terminology and the required Terminology and Art Asset Rules section.
 - `docs/GAME_SCOPE.md`: generic character terminology; all gameplay rules retained.
-- `docs/ART_ASSETS.md`: current missing character is a generic Creature, with no prescribed species.
+- `docs/ART_ASSETS.md`: character art uses generic Creature terminology, with no prescribed species. The latest base-visual todo is recorded above.
 - `docs/art/manifest.json`: current generic art decision; the original decision retained in an explicitly historical field.
-- `docs/HANDOFF.md`: current names, migration, verification and pending smoke check.
+- `docs/HANDOFF.md`: current names, migration, verification and the user's successful post-rename smoke test report.
 - `docs/history/HANDOFF_BEFORE_UNIT_RENAME.md`: historical pre-update handoff, retained unchanged below an explanatory header.
 - `README.md` was inspected and already used generic terminology; no change was needed.
 
 ## History and Working Tree
 
-The complete previous handoff is preserved in [the historical handoff](history/HANDOFF_BEFORE_UNIT_RENAME.md). Its old filenames and then-pending Play statements describe earlier passes, before the user's later report of a successful pre-rename Play check. They do not override the current status above.
+The complete previous handoff is preserved in [the historical handoff](history/HANDOFF_BEFORE_UNIT_RENAME.md). Its old filenames and then-pending Play statements describe earlier passes, before the user's later reports of successful pre-rename Play and post-rename smoke tests. They do not override the current status above.
 
-At the start of this update, the working tree already contained an unrelated `ProjectSettings/QualitySettings.asset` modification and untracked exported art, M1A scene, prefab and generated placeholders. These were preserved; the existing scene and prefab were migrated as described above. Unstaged file renames may appear in `git status` as deleted old paths plus untracked new paths until staging; their Unity GUIDs are preserved independently of Git's display.
+At the start of the terminology migration, the working tree already contained an unrelated `ProjectSettings/QualitySettings.asset` modification and untracked exported art, M1A scene, prefab and generated placeholders. These were preserved; the existing scene and prefab were migrated as described above. Unstaged file renames appeared as deleted old paths plus untracked new paths; their Unity GUIDs were preserved independently of Git's display. At the start of this smoke-test documentation follow-up, `git status --short` was clean.
 
 Git reports permission denied reading `C:/Users/95799/.config/git/ignore`; repository status remains readable. No Git configuration was changed.
 
-No Computer Use, Unity launch/control, branch change, merge, reset, stash, commit or push was performed. The next action is the short manual post-rename Unity smoke check. M1B has not started.
+Codex did not use Computer Use, launch/control Unity, change branches, merge, reset, stash, commit or push. The manual Unity test was performed by the user. The remaining art task is to confirm or create the playable population Creature / Unit base visual. M1B has not started.
