@@ -1,6 +1,6 @@
 namespace Eggs.Gameplay
 {
-    public enum DogWorkState
+    public enum UnitWorkState
     {
         Idle,
         Gathering,

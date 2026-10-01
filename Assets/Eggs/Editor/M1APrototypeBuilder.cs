@@ -14,7 +14,7 @@ namespace Eggs.Editor
     {
         private const string MenuPath = "Tools/Eggs/Build M1A Prototype";
         private const string ScenePath = "Assets/Eggs/Scenes/Eggs_M1A.unity";
-        private const string PrefabPath = "Assets/Eggs/Prefabs/Dog_M1A.prefab";
+        private const string PrefabPath = "Assets/Eggs/Prefabs/Unit_M1A.prefab";
         private const string ArtFolder = "Assets/Eggs/Generated/M1A";
 
         [MenuItem(MenuPath)]
@@ -36,8 +36,8 @@ namespace Eggs.Editor
             }
 
             if (File.Exists(ScenePath) && !EditorUtility.DisplayDialog("Rebuild M1A scene?",
-                $"Replace {ScenePath} with a fresh scene containing exactly four dogs and three zones? "
-                + "Scene edits will be lost. Existing Dog prefab and placeholder assets are reused. "
+                $"Replace {ScenePath} with a fresh scene containing exactly four units and three zones? "
+                + "Scene edits will be lost. Existing Unit prefab and placeholder assets are reused. "
                 + "Save a copy of a customized scene before rebuilding.", "Rebuild", "Cancel"))
                 return;
 
@@ -70,15 +70,15 @@ namespace Eggs.Editor
 
                 WorkZone[] zones =
                 {
-                    CreateZone("Food Zone", "FOOD", DogWorkState.Gathering,
+                    CreateZone("Food Zone", "FOOD", UnitWorkState.Gathering,
                         -4.8f, new Color(0.24f, 0.72f, 0.40f, 0.55f), square, material, font),
-                    CreateZone("Love Nest Zone", "LOVE NEST", DogWorkState.Breeding,
+                    CreateZone("Love Nest Zone", "LOVE NEST", UnitWorkState.Breeding,
                         0f, new Color(0.86f, 0.38f, 0.54f, 0.55f), square, material, font),
-                    CreateZone("Defense Zone", "DEFENSE", DogWorkState.Defending,
+                    CreateZone("Defense Zone", "DEFENSE", UnitWorkState.Defending,
                         4.8f, new Color(0.28f, 0.52f, 0.90f, 0.55f), square, material, font)
                 };
 
-                GameObject prefab = GetOrCreateDogPrefab(circle, material, font);
+                GameObject prefab = GetOrCreateUnitPrefab(circle, material, font);
                 Color[] colors =
                 {
                     new Color(1f, 0.75f, 0.25f), new Color(0.45f, 0.9f, 0.95f),
@@ -86,21 +86,21 @@ namespace Eggs.Editor
                 };
                 for (int i = 0; i < 4; i++)
                 {
-                    GameObject dog = (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
-                    dog.name = $"Dog {i + 1}";
-                    dog.transform.position = new Vector3(-3.6f + i * 2.4f, -3f, 0f);
-                    dog.GetComponent<SpriteRenderer>().color = colors[i];
-                    TextMesh label = dog.GetComponentInChildren<TextMesh>();
+                    GameObject unit = (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
+                    unit.name = $"Unit {i + 1}";
+                    unit.transform.position = new Vector3(-3.6f + i * 2.4f, -3f, 0f);
+                    unit.GetComponent<SpriteRenderer>().color = colors[i];
+                    TextMesh label = unit.GetComponentInChildren<TextMesh>();
                     if (label != null)
-                        label.text = dog.name + "\nIdle";
-                    PrefabUtility.RecordPrefabInstancePropertyModifications(dog);
-                    PrefabUtility.RecordPrefabInstancePropertyModifications(dog.transform);
-                    PrefabUtility.RecordPrefabInstancePropertyModifications(dog.GetComponent<SpriteRenderer>());
+                        label.text = unit.name + "\nIdle";
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(unit);
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(unit.transform);
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(unit.GetComponent<SpriteRenderer>());
                     if (label != null)
                         PrefabUtility.RecordPrefabInstancePropertyModifications(label);
                 }
 
-                DogDragController controller = new GameObject("Dog Drag Controller").AddComponent<DogDragController>();
+                UnitDragController controller = new GameObject("Unit Drag Controller").AddComponent<UnitDragController>();
                 SerializedObject controllerData = new SerializedObject(controller);
                 controllerData.FindProperty("inputCamera").objectReferenceValue = camera;
                 SerializedProperty zoneReferences = controllerData.FindProperty("workZones");
@@ -110,7 +110,7 @@ namespace Eggs.Editor
                 controllerData.ApplyModifiedPropertiesWithoutUndo();
 
                 CreateLabel("Instructions", null, new Vector3(0f, 4.6f, 0f),
-                    "M1A - Drag dogs between work zones", font, 0.09f, TextAnchor.MiddleCenter);
+                    "M1A - Drag units between work zones", font, 0.09f, TextAnchor.MiddleCenter);
                 CreateLabel("Idle Hint", null, new Vector3(0f, -4.6f, 0f),
                     "Pick up = Idle    |    Drop outside zones = Idle", font, 0.075f, TextAnchor.MiddleCenter);
 
@@ -131,7 +131,7 @@ namespace Eggs.Editor
         [MenuItem(MenuPath, true)]
         private static bool CanBuild() => !EditorApplication.isPlayingOrWillChangePlaymode;
 
-        private static WorkZone CreateZone(string name, string heading, DogWorkState state,
+        private static WorkZone CreateZone(string name, string heading, UnitWorkState state,
             float x, Color color, Sprite sprite, Material material, Font font)
         {
             GameObject root = new GameObject(name);
@@ -161,24 +161,24 @@ namespace Eggs.Editor
             return zone;
         }
 
-        private static GameObject GetOrCreateDogPrefab(Sprite sprite, Material material, Font font)
+        private static GameObject GetOrCreateUnitPrefab(Sprite sprite, Material material, Font font)
         {
             GameObject existing = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
             if (existing != null)
             {
-                if (existing.GetComponent<DogUnit>() == null || existing.GetComponent<Collider2D>() == null
+                if (existing.GetComponent<UnitActor>() == null || existing.GetComponent<Collider2D>() == null
                     || existing.GetComponent<SpriteRenderer>() == null)
-                    throw new InvalidOperationException("Existing Dog_M1A prefab needs DogUnit, Collider2D and SpriteRenderer. "
+                    throw new InvalidOperationException("Existing Unit_M1A prefab needs UnitActor, Collider2D and SpriteRenderer. "
                         + "Repair it or move it to another path before rebuilding.");
                 return existing;
             }
             if (File.Exists(PrefabPath))
                 throw new InvalidOperationException("Cannot read existing prefab: " + PrefabPath);
 
-            GameObject root = new GameObject("Dog_M1A");
+            GameObject root = new GameObject("Unit_M1A");
             try
             {
-                DogUnit dog = root.AddComponent<DogUnit>();
+                UnitActor unit = root.AddComponent<UnitActor>();
                 CircleCollider2D collider = root.AddComponent<CircleCollider2D>();
                 collider.radius = 0.48f;
                 collider.isTrigger = true;
@@ -187,8 +187,8 @@ namespace Eggs.Editor
                 renderer.sharedMaterial = material;
                 root.AddComponent<SortingGroup>().sortingOrder = 10;
                 TextMesh label = CreateLabel("State Label", root.transform, new Vector3(0f, 0.9f, 0f),
-                    "Dog\nIdle", font, 0.065f, TextAnchor.MiddleCenter);
-                WireDebugLabel(root.AddComponent<M1ADebugLabel>(), label, dog, null, string.Empty);
+                    "Unit\nIdle", font, 0.065f, TextAnchor.MiddleCenter);
+                WireDebugLabel(root.AddComponent<M1ADebugLabel>(), label, unit, null, string.Empty);
                 GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
                 if (prefab == null)
                     throw new InvalidOperationException("Could not create " + PrefabPath);
@@ -221,11 +221,11 @@ namespace Eggs.Editor
         }
 
         private static void WireDebugLabel(M1ADebugLabel display, TextMesh label,
-            DogUnit dog, WorkZone zone, string heading)
+            UnitActor unit, WorkZone zone, string heading)
         {
             SerializedObject data = new SerializedObject(display);
             data.FindProperty("label").objectReferenceValue = label;
-            data.FindProperty("dog").objectReferenceValue = dog;
+            data.FindProperty("unit").objectReferenceValue = unit;
             data.FindProperty("zone").objectReferenceValue = zone;
             data.FindProperty("heading").stringValue = heading;
             data.ApplyModifiedPropertiesWithoutUndo();

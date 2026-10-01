@@ -3,18 +3,18 @@ using UnityEngine;
 namespace Eggs.Gameplay
 {
     [DisallowMultipleComponent]
-    public sealed class DogUnit : MonoBehaviour
+    public sealed class UnitActor : MonoBehaviour
     {
-        public DogWorkState CurrentState { get; private set; } = DogWorkState.Idle;
+        public UnitWorkState CurrentState { get; private set; } = UnitWorkState.Idle;
         public WorkZone CurrentZone { get; private set; }
 
         // The only entry point for both state changes and zone membership changes.
         public void AssignTo(WorkZone zone)
         {
-            if (zone != null && (!isActiveAndEnabled || !zone.CanAcceptDogs))
+            if (zone != null && (!isActiveAndEnabled || !zone.CanAcceptUnits))
                 zone = null;
 
-            DogWorkState nextState = zone != null ? zone.TargetState : DogWorkState.Idle;
+            UnitWorkState nextState = zone != null ? zone.TargetState : UnitWorkState.Idle;
             if (CurrentZone == zone && CurrentState == nextState)
                 return;
 

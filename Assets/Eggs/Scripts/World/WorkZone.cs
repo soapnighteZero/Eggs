@@ -7,24 +7,24 @@ namespace Eggs.Gameplay
     [DisallowMultipleComponent]
     public sealed class WorkZone : MonoBehaviour
     {
-        [SerializeField] private DogWorkState targetState = DogWorkState.Gathering;
+        [SerializeField] private UnitWorkState targetState = UnitWorkState.Gathering;
         [SerializeField] private Collider2D dropArea;
-        [Tooltip("Optional. Leave empty to keep each dog at its drop position.")]
+        [Tooltip("Optional. Leave empty to keep each unit at its drop position.")]
         [SerializeField] private Transform snapPoint;
         [SerializeField] private Color gizmoColor = new Color(0.3f, 0.8f, 0.5f, 0.8f);
 
-        private readonly List<DogUnit> members = new List<DogUnit>();
-        private ReadOnlyCollection<DogUnit> readOnlyMembers;
+        private readonly List<UnitActor> members = new List<UnitActor>();
+        private ReadOnlyCollection<UnitActor> readOnlyMembers;
 
-        public DogWorkState TargetState => targetState;
-        public IReadOnlyList<DogUnit> Members => readOnlyMembers ??= members.AsReadOnly();
+        public UnitWorkState TargetState => targetState;
+        public IReadOnlyList<UnitActor> Members => readOnlyMembers ??= members.AsReadOnly();
         public int MemberCount => members.Count;
-        public bool CanAcceptDogs => isActiveAndEnabled && targetState != DogWorkState.Idle
+        public bool CanAcceptUnits => isActiveAndEnabled && targetState != UnitWorkState.Idle
             && dropArea != null && dropArea.enabled && dropArea.gameObject.activeInHierarchy;
 
         public bool Contains(Vector2 worldPoint)
         {
-            return CanAcceptDogs && dropArea.OverlapPoint(worldPoint);
+            return CanAcceptUnits && dropArea.OverlapPoint(worldPoint);
         }
 
         public Vector3 GetDropPosition(Vector3 position)
@@ -37,25 +37,25 @@ namespace Eggs.Gameplay
             return position;
         }
 
-        // Only DogUnit can change membership, after changing its authoritative owner.
-        internal void AddMember(DogUnit dog)
+        // Only UnitActor can change membership, after changing its authoritative owner.
+        internal void AddMember(UnitActor unit)
         {
-            if (dog != null && dog.CurrentZone == this && !members.Contains(dog))
-                members.Add(dog);
+            if (unit != null && unit.CurrentZone == this && !members.Contains(unit))
+                members.Add(unit);
         }
 
-        internal void RemoveMember(DogUnit dog)
+        internal void RemoveMember(UnitActor unit)
         {
-            members.Remove(dog);
+            members.Remove(unit);
         }
 
         private void OnDisable()
         {
             while (members.Count > 0)
             {
-                DogUnit dog = members[members.Count - 1];
-                if (dog != null && dog.CurrentZone == this)
-                    dog.AssignTo(null);
+                UnitActor unit = members[members.Count - 1];
+                if (unit != null && unit.CurrentZone == this)
+                    unit.AssignTo(null);
                 else
                     members.RemoveAt(members.Count - 1);
             }

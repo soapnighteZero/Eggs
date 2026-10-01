@@ -129,7 +129,7 @@ There must be only one authoritative runtime value for each of:
 
 Do not create multiple competing managers that each own the same value.
 
-An animal may belong to exactly one work state at a time.
+A Unit may belong to exactly one work state at a time.
 
 Initial work states:
 
@@ -138,13 +138,13 @@ Initial work states:
 - Breeding
 - Defending
 
-When an animal changes work:
+When a Unit changes work:
 
 1. remove it from the previous work assignment;
 2. assign the new state;
 3. ensure old zones no longer retain it.
 
-No animal may simultaneously produce Food and Breed or Defend.
+No Unit may simultaneously produce Food and Breed or Defend.
 
 ---
 
@@ -161,7 +161,7 @@ Do not hard-code final art asset paths inside gameplay C#.
 
 Do not require editing gameplay code merely to swap:
 
-- dog sprite
+- Creature sprite
 - egg sprite
 - nest sprite
 - enemy sprite
@@ -188,7 +188,7 @@ unless explicitly approved.
 
 Reusable runtime objects should use Prefabs where useful:
 
-- Dog
+- Unit
 - Egg
 - Enemy
 
@@ -275,3 +275,22 @@ Record facts only:
 - next recommended action
 
 HANDOFF must not introduce new gameplay rules.
+
+---
+
+## Terminology and Art Asset Rules
+
+- Runtime gameplay code uses generic Unit terminology.
+- Final visual characters are Creatures and are not tied to a specific species.
+- Gameplay code must never assume a Unit is a dog or any other specific animal.
+- Character identity belongs to presentation / art, not core gameplay logic.
+- Replacing character artwork must not require changing gameplay code.
+- Unit Prefabs expose SpriteRenderer / Animator / visual child references through Prefab or Inspector.
+- Final sprites, animations and VFX must not be loaded through hard-coded asset paths in gameplay code.
+- Runtime logic must operate on UnitActor regardless of the final visual character.
+- Placeholder circles / sprites are debug presentation only.
+- Art can replace visual children without replacing core gameplay components.
+- Creature visuals may vary, but all playable population units currently share the same core gameplay rules unless GAME_SCOPE.md explicitly changes this.
+
+Do not introduce species-specific names into core gameplay classes, fields,
+prefabs or systems unless the species itself becomes a confirmed gameplay mechanic.

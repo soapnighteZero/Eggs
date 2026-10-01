@@ -6,7 +6,7 @@ Regrowth
 
 ## One Sentence
 
-玩家拖拽仅存的小狗去采集、繁殖和防守，在敌人不断攻击爱巢的压力下孵化新的小狗，让濒危种群重新恢复。
+玩家拖拽仅存的小角色去采集、繁殖和防守，在敌人不断攻击爱巢的压力下孵化新的小角色，让濒危种群重新恢复。
 
 ## Theme Expression
 
@@ -36,7 +36,7 @@ Regrowth 必须直接发生在核心玩法中。
 
 ## Core Player Decision
 
-同一批有限的小狗必须在三个需求之间重新分配：
+同一批有限的小角色必须在三个需求之间重新分配：
 
 ### Gathering
 生产 Food。
@@ -53,33 +53,33 @@ Regrowth 必须直接发生在核心玩法中。
 vs
 “投资未来的种群恢复”。
 
-如果把太多狗用于繁殖：
+如果把太多小角色用于繁殖：
 当前防守变弱。
 
-如果把太多狗用于防守：
+如果把太多小角色用于防守：
 Food 与 Population 增长变慢。
 
 ---
 
 ## Core Loop
 
-拖拽分配小狗
+拖拽分配小角色
 
 → Gathering 产生 Food
 
-→ 两只狗进入 Love Nest
+→ 两个小角色进入 Love Nest
 
 → 消耗 Food 开始繁殖
 
 → 产生 Egg
 
-→ Egg 孵化新狗
+→ Egg 孵化新生小角色
 
 → Population 增长
 
 → 敌人来袭
 
-→ 玩家把狗重新调到 Defense
+→ 玩家把小角色重新调到 Defense
 
 → 守住 Love Nest
 
@@ -100,11 +100,11 @@ Food 与 Population 增长变慢。
 - 后续也是必须保护的核心
 
 ### Food Zone
-- 狗进入后成为 Gathering
+- 小角色进入后成为 Gathering
 - 持续生产 Food
 
 ### Defense Zone
-- 狗进入后成为 Defending
+- 小角色进入后成为 Defending
 - M1 只需要完成状态分配
 - M2 才真正攻击敌人
 
@@ -135,10 +135,10 @@ Food 与 Population 增长变慢。
 
 初始：
 
-- 4 只普通狗
+- 4 个小角色
 - 一定初始 Food
 
-每只狗支持：
+每个小角色支持：
 
 - 鼠标拖拽
 - Idle
@@ -151,24 +151,24 @@ M1 中 Defending 只需要正确保存工作状态，
 
 Food Zone：
 
-- Gathering 狗持续产生 Food
+- Gathering 小角色持续产生 Food
 - 拖走后立即停止产生 Food
 
 Love Nest：
 
-- 至少两只狗才能开始繁殖
+- 至少两个小角色才能开始繁殖
 - 必须有足够 Food
 - 一次繁殖只消耗一次 Food
-- 参与繁殖的两只狗暂时不能承担其他工作
+- 参与繁殖的两个小角色暂时不能承担其他工作
 - 繁殖经过时间后产生一个 Egg
 
 Egg：
 
 - Egg 经过 Hatch Duration
-- 孵化出一只新的普通狗
+- 孵化出一个新的小角色
 - Population +1
-- 新生狗和初始狗使用同一套核心逻辑
-- 新生狗也可继续拖拽和重新分配
+- 新生小角色和初始小角色使用同一套核心逻辑
+- 新生小角色也可继续拖拽和重新分配
 
 Minimum HUD：
 
@@ -179,10 +179,10 @@ Minimum HUD：
 
 玩家必须能够通过真实鼠标操作亲自完成：
 
-4 dogs
+4 units
 → assign Gathering
 → gain Food
-→ move 2 dogs into Love Nest
+→ move 2 units into Love Nest
 → Breed
 → Egg appears
 → Egg hatches
@@ -219,32 +219,32 @@ Enemy:
 - 从屏幕边缘生成
 - 只向 Love Nest 移动
 - 到达 Nest 后攻击 Nest
-- 可以被 Defending 狗杀死
+- 可以被 Defending 小角色杀死
 
-Defending Dog:
+Defending Unit:
 
 - 自动攻击进入防守范围的敌人
 - 不需要玩家逐个指定敌人
 
 ## Hard Simplifications
 
-狗没有 HP。
+小角色没有 HP。
 
-敌人不攻击狗。
+敌人不攻击小角色。
 
 不做：
 
 - aggro
 - threat
-- dog damage
-- dog combat death
+- unit damage
+- unit combat death
 - NavMesh
 - pathfinding
 - multiple enemy behaviours
 
 Defense 的决策核心仍然是：
 
-“我要分多少只狗回来保护 Love Nest？”
+“我要分多少个小角色回来保护 Love Nest？”
 
 ---
 
@@ -304,10 +304,10 @@ Love Nest HP <= 0
 - 采集者职业
 - 守卫职业升级
 - 照料者
-- 狗 HP
-- 狗被攻击
-- 狗战斗死亡
-- 敌人攻击狗
+- 小角色 HP
+- 小角色被攻击
+- 小角色战斗死亡
+- 敌人攻击小角色
 - 多种敌人
 - Boss
 - NavMesh

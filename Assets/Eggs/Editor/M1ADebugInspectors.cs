@@ -4,17 +4,17 @@ using UnityEngine;
 
 namespace Eggs.Editor
 {
-    [CustomEditor(typeof(DogUnit))]
-    public sealed class DogUnitInspector : UnityEditor.Editor
+    [CustomEditor(typeof(UnitActor))]
+    public sealed class UnitActorInspector : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
-            DogUnit dog = (DogUnit)target;
+            UnitActor unit = (UnitActor)target;
             using (new EditorGUI.DisabledScope(true))
             {
-                EditorGUILayout.EnumPopup("Current State", dog.CurrentState);
-                EditorGUILayout.ObjectField("Current Zone", dog.CurrentZone, typeof(WorkZone), true);
+                EditorGUILayout.EnumPopup("Current State", unit.CurrentState);
+                EditorGUILayout.ObjectField("Current Zone", unit.CurrentZone, typeof(WorkZone), true);
             }
             if (Application.isPlaying)
                 Repaint();
@@ -34,8 +34,8 @@ namespace Eggs.Editor
             using (new EditorGUI.DisabledScope(true))
             {
                 EditorGUILayout.IntField("Member Count", zone.MemberCount);
-                foreach (DogUnit dog in zone.Members)
-                    EditorGUILayout.ObjectField("Member", dog, typeof(DogUnit), true);
+                foreach (UnitActor unit in zone.Members)
+                    EditorGUILayout.ObjectField("Member", unit, typeof(UnitActor), true);
             }
             if (Application.isPlaying)
                 Repaint();

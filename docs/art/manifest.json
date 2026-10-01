@@ -1,0 +1,1409 @@
+{
+  "source": "D:\\01STUDY\\2026gamejam\\EGGART\\EGGS.psd",
+  "source_sha256": "e4874ce71f2b1cf8bec889f76db5b788a30ed049006698d6129657514f4c2d80",
+  "canvas_px": [
+    1920,
+    1080
+  ],
+  "depth": 8,
+  "color_mode": "RGB",
+  "layer_index_order": "zero-based, bottom to top",
+  "source_layers": [
+    {
+      "index": 0,
+      "name": "地板",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "viewport": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "export_size": [
+        1920,
+        1080
+      ],
+      "effects": [],
+      "sha256_rgba": "633180bea86e44a3690a2096adf652571cc282b7b466cb83ab412411b43d7a1f"
+    },
+    {
+      "index": 1,
+      "name": "周围的森林遮罩 敌人从这下面出现",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "viewport": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "export_size": [
+        1920,
+        1080
+      ],
+      "effects": [],
+      "sha256_rgba": "3687d89861e80b6265ea1d893b85ac757dd5bf3f16bf79a8272bfac3a152d406"
+    },
+    {
+      "index": 2,
+      "name": "射手",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        893,
+        217,
+        1052,
+        360
+      ],
+      "viewport": [
+        893,
+        217,
+        1052,
+        360
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        159,
+        143
+      ],
+      "export_size": [
+        159,
+        143
+      ],
+      "effects": [],
+      "sha256_rgba": "4bab4344e90ed59769a9d4367ed1d71b3632880b2a46c7cab86c9ae6cbb8173f"
+    },
+    {
+      "index": 3,
+      "name": "敌人",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        1709,
+        764,
+        1920,
+        956
+      ],
+      "viewport": [
+        1709,
+        764,
+        1920,
+        956
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        211,
+        192
+      ],
+      "export_size": [
+        211,
+        192
+      ],
+      "effects": [],
+      "sha256_rgba": "8127431c282e66d4cac834dc0868d7e029bd2a14037c3a9d8744fb9ca77641d2"
+    },
+    {
+      "index": 4,
+      "name": "敌人",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        -66,
+        608,
+        145,
+        800
+      ],
+      "viewport": [
+        -66,
+        608,
+        145,
+        800
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        211,
+        192
+      ],
+      "export_size": [
+        211,
+        192
+      ],
+      "effects": [],
+      "sha256_rgba": "a3ae0cc643eb2d2a6ee0a8c1fd003ca597ebbe897d4b128ae8350ac7f515d539"
+    },
+    {
+      "index": 5,
+      "name": "射手",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        1121,
+        345,
+        1280,
+        488
+      ],
+      "viewport": [
+        1121,
+        345,
+        1280,
+        488
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        159,
+        143
+      ],
+      "export_size": [
+        159,
+        143
+      ],
+      "effects": [],
+      "sha256_rgba": "4bab4344e90ed59769a9d4367ed1d71b3632880b2a46c7cab86c9ae6cbb8173f"
+    },
+    {
+      "index": 6,
+      "name": "射手",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        669,
+        345,
+        828,
+        488
+      ],
+      "viewport": [
+        669,
+        345,
+        828,
+        488
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        159,
+        143
+      ],
+      "export_size": [
+        159,
+        143
+      ],
+      "effects": [],
+      "sha256_rgba": "4bab4344e90ed59769a9d4367ed1d71b3632880b2a46c7cab86c9ae6cbb8173f"
+    },
+    {
+      "index": 7,
+      "name": "巢穴",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        862,
+        400,
+        1100,
+        638
+      ],
+      "viewport": [
+        830,
+        368,
+        1132,
+        670
+      ],
+      "alpha_bbox": [
+        26,
+        26,
+        277,
+        277
+      ],
+      "export_size": [
+        251,
+        251
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 8.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_rgba": "6354f769016e0e2149d8a4dd1f5732e48db39ec4893ad6af386313f7d9bda3fc"
+    },
+    {
+      "index": 8,
+      "name": "蛋",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        952,
+        506,
+        1035,
+        601
+      ],
+      "viewport": [
+        920,
+        474,
+        1067,
+        633
+      ],
+      "alpha_bbox": [
+        29,
+        29,
+        119,
+        131
+      ],
+      "export_size": [
+        90,
+        102
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 5.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_rgba": "245cf61c0b5a9a610aa8e3ce36ed9d50d18df939e52e117aa777aab26e369c8a"
+    },
+    {
+      "index": 9,
+      "name": "蛋",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        918,
+        414,
+        1001,
+        509
+      ],
+      "viewport": [
+        886,
+        382,
+        1033,
+        541
+      ],
+      "alpha_bbox": [
+        29,
+        29,
+        119,
+        131
+      ],
+      "export_size": [
+        90,
+        102
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 5.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_rgba": "75edbd0a40398daf4a59cd5a76945ed84bc1ba099f5d9a6afd684db89441e08f"
+    },
+    {
+      "index": 10,
+      "name": "蛋",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        981,
+        453,
+        1064,
+        548
+      ],
+      "viewport": [
+        949,
+        421,
+        1096,
+        580
+      ],
+      "alpha_bbox": [
+        29,
+        29,
+        119,
+        131
+      ],
+      "export_size": [
+        90,
+        102
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 5.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_rgba": "75edbd0a40398daf4a59cd5a76945ed84bc1ba099f5d9a6afd684db89441e08f"
+    },
+    {
+      "index": 11,
+      "name": "蛋",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        901,
+        471,
+        984,
+        566
+      ],
+      "viewport": [
+        869,
+        439,
+        1016,
+        598
+      ],
+      "alpha_bbox": [
+        29,
+        29,
+        119,
+        131
+      ],
+      "export_size": [
+        90,
+        102
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 5.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_rgba": "75edbd0a40398daf4a59cd5a76945ed84bc1ba099f5d9a6afd684db89441e08f"
+    },
+    {
+      "index": 12,
+      "name": "食物",
+      "kind": "type",
+      "visible": true,
+      "bbox": [
+        1474,
+        133,
+        1587,
+        190
+      ],
+      "viewport": [
+        1474,
+        133,
+        1587,
+        190
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        113,
+        57
+      ],
+      "export_size": [
+        113,
+        57
+      ],
+      "effects": [],
+      "sha256_rgba": "634c2dc579ef92c2192ab9720e51ef7d638e489c1072dbd28d9d26a96c094997",
+      "text": "食物",
+      "font_resources": "[{'Name': 'MicrosoftYaHei-Bold', 'Script': 3, 'FontType': 1, 'Synthetic': 0}, {'Name': 'AdobeInvisFont', 'Script': 0, 'FontType': 0, 'Synthetic': 0}, {'Name': 'AdobeHeitiStd-Regular', 'Script': 3, 'FontType': 2, 'Synthetic': 0}]"
+    },
+    {
+      "index": 13,
+      "name": "蛋的数量：3",
+      "kind": "type",
+      "visible": true,
+      "bbox": [
+        911,
+        665,
+        1089,
+        696
+      ],
+      "viewport": [
+        911,
+        665,
+        1089,
+        696
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        178,
+        31
+      ],
+      "export_size": [
+        178,
+        31
+      ],
+      "effects": [],
+      "sha256_rgba": "d1a699bab4bb9271749b5d4545ba0877da172884ed065aab89f684c9184ca55f",
+      "text": "蛋的数量：3",
+      "font_resources": "[{'Name': 'MicrosoftYaHei-Bold', 'Script': 3, 'FontType': 1, 'Synthetic': 0}, {'Name': 'AdobeInvisFont', 'Script': 0, 'FontType': 0, 'Synthetic': 0}, {'Name': 'AdobeHeitiStd-Regular', 'Script': 3, 'FontType': 2, 'Synthetic': 0}]"
+    },
+    {
+      "index": 14,
+      "name": "23",
+      "kind": "type",
+      "visible": true,
+      "bbox": [
+        1615,
+        137,
+        1681,
+        183
+      ],
+      "viewport": [
+        1615,
+        137,
+        1681,
+        183
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        66,
+        46
+      ],
+      "export_size": [
+        66,
+        46
+      ],
+      "effects": [],
+      "sha256_rgba": "30903fa896930bf6ad517382d52c7227ec96f91dd2c6d7c41a96b31fade21f94",
+      "text": "23",
+      "font_resources": "[{'Name': 'MicrosoftYaHei-Bold', 'Script': 3, 'FontType': 1, 'Synthetic': 0}, {'Name': 'AdobeInvisFont', 'Script': 0, 'FontType': 0, 'Synthetic': 0}, {'Name': 'AdobeHeitiStd-Regular', 'Script': 3, 'FontType': 2, 'Synthetic': 0}]"
+    },
+    {
+      "index": 15,
+      "name": "种群数量",
+      "kind": "type",
+      "visible": true,
+      "bbox": [
+        40,
+        34,
+        271,
+        91
+      ],
+      "viewport": [
+        40,
+        34,
+        271,
+        91
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        231,
+        57
+      ],
+      "export_size": [
+        231,
+        57
+      ],
+      "effects": [],
+      "sha256_rgba": "ef6404f254aeb5aa56d465f2b3587070e186bfabcc420a39dd632ae1200b85df",
+      "text": "种群数量",
+      "font_resources": "[{'Name': 'MicrosoftYaHei-Bold', 'Script': 3, 'FontType': 1, 'Synthetic': 0}, {'Name': 'AdobeInvisFont', 'Script': 0, 'FontType': 0, 'Synthetic': 0}, {'Name': 'AdobeHeitiStd-Regular', 'Script': 3, 'FontType': 2, 'Synthetic': 0}]"
+    },
+    {
+      "index": 16,
+      "name": "血条底",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        1204,
+        988,
+        1897,
+        1043
+      ],
+      "viewport": [
+        1172,
+        956,
+        1929,
+        1075
+      ],
+      "alpha_bbox": [
+        26,
+        26,
+        732,
+        94
+      ],
+      "export_size": [
+        706,
+        68
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 8.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_rgba": "4b5939f8d56a43a912d2331c1114e90619111e514ad608a0adf445e85d9be408"
+    },
+    {
+      "index": 17,
+      "name": "血条",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        1204,
+        988,
+        1897,
+        1043
+      ],
+      "viewport": [
+        1204,
+        988,
+        1897,
+        1043
+      ],
+      "alpha_bbox": [
+        2,
+        2,
+        692,
+        54
+      ],
+      "export_size": [
+        690,
+        52
+      ],
+      "effects": [],
+      "sha256_rgba": "5c4799bd1de5e3ae857a75dd18053e478c74bd7394a08422e7cfe0527b3b529f"
+    },
+    {
+      "index": 18,
+      "name": "训练",
+      "kind": "type",
+      "visible": true,
+      "bbox": [
+        165,
+        764,
+        312,
+        836
+      ],
+      "viewport": [
+        165,
+        764,
+        312,
+        836
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        147,
+        72
+      ],
+      "export_size": [
+        147,
+        72
+      ],
+      "effects": [],
+      "sha256_rgba": "e60bca046db43b6f8aabf79f0142e74414d246f9857cbcfdb104b6062a5b6aa8",
+      "text": "训练",
+      "font_resources": "[{'Name': 'MicrosoftYaHei-Bold', 'Script': 3, 'FontType': 1, 'Synthetic': 0}, {'Name': 'AdobeInvisFont', 'Script': 0, 'FontType': 0, 'Synthetic': 0}, {'Name': 'AdobeHeitiStd-Regular', 'Script': 3, 'FontType': 2, 'Synthetic': 0}]"
+    },
+    {
+      "index": 19,
+      "name": "训练区",
+      "kind": "shape",
+      "visible": true,
+      "bbox": [
+        152,
+        854,
+        324,
+        1026
+      ],
+      "viewport": [
+        120,
+        822,
+        356,
+        1058
+      ],
+      "alpha_bbox": [
+        26,
+        26,
+        211,
+        211
+      ],
+      "export_size": [
+        185,
+        185
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 8.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_rgba": "06c0bc248233fffe087cf805e4966b533d0a28393701e131635d5807e1c7af6a"
+    },
+    {
+      "index": 20,
+      "name": "敌人",
+      "kind": "type",
+      "visible": true,
+      "bbox": [
+        1206,
+        895,
+        1353,
+        966
+      ],
+      "viewport": [
+        1206,
+        895,
+        1353,
+        966
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        147,
+        71
+      ],
+      "export_size": [
+        147,
+        71
+      ],
+      "effects": [],
+      "sha256_rgba": "ea8220146f04612d64d05f1ad1303588fbd5bc25c2d536805b2a378ef7200212",
+      "text": "敌人",
+      "font_resources": "[{'Name': 'MicrosoftYaHei-Bold', 'Script': 3, 'FontType': 1, 'Synthetic': 0}, {'Name': 'AdobeInvisFont', 'Script': 0, 'FontType': 0, 'Synthetic': 0}, {'Name': 'AdobeHeitiStd-Regular', 'Script': 3, 'FontType': 2, 'Synthetic': 0}]"
+    },
+    {
+      "index": 21,
+      "name": "守护蛋的角色",
+      "kind": "pixel",
+      "visible": true,
+      "bbox": [
+        920,
+        387,
+        1069,
+        544
+      ],
+      "viewport": [
+        888,
+        355,
+        1101,
+        576
+      ],
+      "alpha_bbox": [
+        28,
+        29,
+        185,
+        192
+      ],
+      "export_size": [
+        157,
+        163
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 4.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_rgba": "f7edb3b3b4b1055bce3c6a39faed94efa370546d16cc88efcf72d31c079d2dbd"
+    },
+    {
+      "index": 22,
+      "name": "23 拷贝",
+      "kind": "type",
+      "visible": true,
+      "bbox": [
+        290,
+        38,
+        356,
+        84
+      ],
+      "viewport": [
+        290,
+        38,
+        356,
+        84
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        66,
+        46
+      ],
+      "export_size": [
+        66,
+        46
+      ],
+      "effects": [],
+      "sha256_rgba": "30903fa896930bf6ad517382d52c7227ec96f91dd2c6d7c41a96b31fade21f94",
+      "text": "23",
+      "font_resources": "[{'Name': 'MicrosoftYaHei-Bold', 'Script': 3, 'FontType': 1, 'Synthetic': 0}, {'Name': 'AdobeInvisFont', 'Script': 0, 'FontType': 0, 'Synthetic': 0}, {'Name': 'AdobeHeitiStd-Regular', 'Script': 3, 'FontType': 2, 'Synthetic': 0}]"
+    }
+  ],
+  "exports": [
+    {
+      "path": "Assets/Eggs/Art/Environment/ground.png",
+      "label": "地面背景",
+      "category": "ready",
+      "source_layer_indices": [
+        0
+      ],
+      "source_layer_names": [
+        "地板"
+      ],
+      "source_layer_bbox": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "canvas_origin_psd_xy": [
+        0,
+        0
+      ],
+      "size_px": [
+        1920,
+        1080
+      ],
+      "padding_px": 0,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "effects": [],
+      "sha256_png": "843b03f2d5db541093fa63d45f4c89f251318e3278e681ce3b23d6ff8821af0b",
+      "alias_transforms": {}
+    },
+    {
+      "path": "Assets/Eggs/Art/Environment/forest_foreground.png",
+      "label": "森林前景遮挡",
+      "category": "ready",
+      "source_layer_indices": [
+        1
+      ],
+      "source_layer_names": [
+        "周围的森林遮罩 敌人从这下面出现"
+      ],
+      "source_layer_bbox": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "canvas_origin_psd_xy": [
+        0,
+        0
+      ],
+      "size_px": [
+        1920,
+        1080
+      ],
+      "padding_px": 0,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [],
+      "sha256_png": "5f115ebc094afb60a0d63b50d7591ace46a4192c184546e35a6dcc909f1e0963",
+      "alias_transforms": {}
+    },
+    {
+      "path": "Assets/Eggs/Art/Characters/Enemy/enemy_idle_left.png",
+      "label": "单一种类敌人／静态",
+      "category": "ready",
+      "source_layer_indices": [
+        3,
+        4
+      ],
+      "source_layer_names": [
+        "敌人",
+        "敌人"
+      ],
+      "source_layer_bbox": [
+        1709,
+        764,
+        1920,
+        956
+      ],
+      "canvas_origin_psd_xy": [
+        1707,
+        762
+      ],
+      "size_px": [
+        215,
+        196
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [],
+      "sha256_png": "7f47ddae96e9dc76907cfb17adec03a6536f7f0b46546a008a1e2a3aacf09af8",
+      "alias_transforms": {
+        "4": "horizontal_flip_of_layer_3"
+      }
+    },
+    {
+      "path": "Assets/Eggs/Art/Props/LoveNest/love_nest_base.png",
+      "label": "爱巢底座",
+      "category": "ready",
+      "source_layer_indices": [
+        7
+      ],
+      "source_layer_names": [
+        "巢穴"
+      ],
+      "source_layer_bbox": [
+        862,
+        400,
+        1100,
+        638
+      ],
+      "canvas_origin_psd_xy": [
+        854,
+        392
+      ],
+      "size_px": [
+        255,
+        255
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 8.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_png": "9e9208f457b0d1689c3a54777b28ee62bf890a595e2ee11db203f8958241ad4c",
+      "alias_transforms": {}
+    },
+    {
+      "path": "Assets/Eggs/Art/Props/Egg/egg_neutral.png",
+      "label": "普通蛋候选／中性色",
+      "category": "ready",
+      "source_layer_indices": [
+        8
+      ],
+      "source_layer_names": [
+        "蛋"
+      ],
+      "source_layer_bbox": [
+        952,
+        506,
+        1035,
+        601
+      ],
+      "canvas_origin_psd_xy": [
+        947,
+        501
+      ],
+      "size_px": [
+        94,
+        106
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 5.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_png": "fbd7e404b1c4354e90a625125587b76cd7f618744a0273cacfae8b64744603e5",
+      "alias_transforms": {}
+    },
+    {
+      "path": "Assets/Eggs/Art/UI/Labels/food_label_zh.png",
+      "label": "食物固定标签",
+      "category": "ready",
+      "source_layer_indices": [
+        12
+      ],
+      "source_layer_names": [
+        "食物"
+      ],
+      "source_layer_bbox": [
+        1474,
+        133,
+        1587,
+        190
+      ],
+      "canvas_origin_psd_xy": [
+        1472,
+        131
+      ],
+      "size_px": [
+        117,
+        61
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [],
+      "sha256_png": "dc3081acdeca16bebb203181fa1e3e7ad42a62759e80f3c1978dac5c429d1346",
+      "alias_transforms": {}
+    },
+    {
+      "path": "Assets/Eggs/Art/UI/Labels/population_label_zh.png",
+      "label": "种群数量固定标签",
+      "category": "ready",
+      "source_layer_indices": [
+        15
+      ],
+      "source_layer_names": [
+        "种群数量"
+      ],
+      "source_layer_bbox": [
+        40,
+        34,
+        271,
+        91
+      ],
+      "canvas_origin_psd_xy": [
+        38,
+        32
+      ],
+      "size_px": [
+        235,
+        61
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [],
+      "sha256_png": "aa922dbb712f2c6f72a0ee41a6c6508dedb0a44d743167ea11e8cbc8ea38b814",
+      "alias_transforms": {}
+    },
+    {
+      "path": "Assets/Eggs/Art/UI/Shared/bar_base.png",
+      "label": "通用条底板",
+      "category": "ready",
+      "source_layer_indices": [
+        16
+      ],
+      "source_layer_names": [
+        "血条底"
+      ],
+      "source_layer_bbox": [
+        1204,
+        988,
+        1897,
+        1043
+      ],
+      "canvas_origin_psd_xy": [
+        1196,
+        980
+      ],
+      "size_px": [
+        710,
+        72
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 8.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_png": "083de0bc7c03daebd50acd0739cd1bd158b55033ee84c97294aad37ccda2cb7a",
+      "alias_transforms": {}
+    },
+    {
+      "path": "Assets/Eggs/Art/UI/Shared/bar_fill.png",
+      "label": "通用条填充／对齐底板",
+      "category": "ready",
+      "source_layer_indices": [
+        17
+      ],
+      "source_layer_names": [
+        "血条"
+      ],
+      "source_layer_bbox": [
+        1204,
+        988,
+        1897,
+        1043
+      ],
+      "canvas_origin_psd_xy": [
+        1196,
+        980
+      ],
+      "size_px": [
+        710,
+        72
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [],
+      "sha256_png": "73d170582413a6500595f5ff4cef8e1afbb080e96c1ba02d1646efae9c44579c",
+      "alias_transforms": {}
+    },
+    {
+      "path": "docs/art/reference/Characters/archer_reference.png",
+      "label": "持弓角色／仅供参考",
+      "category": "reference",
+      "source_layer_indices": [
+        2,
+        5,
+        6
+      ],
+      "source_layer_names": [
+        "射手",
+        "射手",
+        "射手"
+      ],
+      "source_layer_bbox": [
+        893,
+        217,
+        1052,
+        360
+      ],
+      "canvas_origin_psd_xy": [
+        891,
+        215
+      ],
+      "size_px": [
+        163,
+        147
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [],
+      "sha256_png": "ea66be7a35f0874e684509450ba360ffa593a1d1075af7c6bbff94aaad129202",
+      "alias_transforms": {}
+    },
+    {
+      "path": "docs/art/reference/Characters/guardian_reference.png",
+      "label": "守护角色／仅供参考",
+      "category": "reference",
+      "source_layer_indices": [
+        21
+      ],
+      "source_layer_names": [
+        "守护蛋的角色"
+      ],
+      "source_layer_bbox": [
+        920,
+        387,
+        1069,
+        544
+      ],
+      "canvas_origin_psd_xy": [
+        914,
+        382
+      ],
+      "size_px": [
+        161,
+        167
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 4.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_png": "2348331f479f9f91c818ad4de1e8bb0161ba94ecd6f4de78804fc7ac3d5298d4",
+      "alias_transforms": {}
+    },
+    {
+      "path": "docs/art/reference/Variants/egg_green_reference.png",
+      "label": "蛋配色备选／非新蛋类型",
+      "category": "reference",
+      "source_layer_indices": [
+        9,
+        10,
+        11
+      ],
+      "source_layer_names": [
+        "蛋",
+        "蛋",
+        "蛋"
+      ],
+      "source_layer_bbox": [
+        918,
+        414,
+        1001,
+        509
+      ],
+      "canvas_origin_psd_xy": [
+        913,
+        409
+      ],
+      "size_px": [
+        94,
+        106
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 5.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_png": "96290d8a9213792b9ef0ee184ee05cad52d9fe18189e78217a8823091cde0a7b",
+      "alias_transforms": {}
+    },
+    {
+      "path": "docs/art/reference/OldDesign/training_label_zh.png",
+      "label": "旧设计：训练文字",
+      "category": "reference",
+      "source_layer_indices": [
+        18
+      ],
+      "source_layer_names": [
+        "训练"
+      ],
+      "source_layer_bbox": [
+        165,
+        764,
+        312,
+        836
+      ],
+      "canvas_origin_psd_xy": [
+        163,
+        762
+      ],
+      "size_px": [
+        151,
+        76
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [],
+      "sha256_png": "38d2f9f450af7097f52c9ac99f1f0f0bd07b6f9e64c89fd643a520321e6a90df",
+      "alias_transforms": {}
+    },
+    {
+      "path": "docs/art/reference/OldDesign/training_panel.png",
+      "label": "旧设计：训练区图形",
+      "category": "reference",
+      "source_layer_indices": [
+        19
+      ],
+      "source_layer_names": [
+        "训练区"
+      ],
+      "source_layer_bbox": [
+        152,
+        854,
+        324,
+        1026
+      ],
+      "canvas_origin_psd_xy": [
+        144,
+        846
+      ],
+      "size_px": [
+        189,
+        189
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [
+        {
+          "kind": "Stroke",
+          "size": 8.0,
+          "position": "StrokePosition.OUTSIDE"
+        }
+      ],
+      "sha256_png": "070ea58aba4fcc6a674ddda6f4b5e6edad5b401158b48ac4fa4e1b37d0b1b42f",
+      "alias_transforms": {}
+    },
+    {
+      "path": "docs/art/reference/OldDesign/enemy_label_zh.png",
+      "label": "旧设计：敌人文字",
+      "category": "reference",
+      "source_layer_indices": [
+        20
+      ],
+      "source_layer_names": [
+        "敌人"
+      ],
+      "source_layer_bbox": [
+        1206,
+        895,
+        1353,
+        966
+      ],
+      "canvas_origin_psd_xy": [
+        1204,
+        893
+      ],
+      "size_px": [
+        151,
+        75
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [],
+      "sha256_png": "c163fc223512908c3742da1787c358f9ea9065962a1139d39cebb66f87ac4a43",
+      "alias_transforms": {}
+    },
+    {
+      "path": "docs/art/reference/MockupText/egg_count_3.png",
+      "label": "示意数字：蛋数量 3",
+      "category": "reference",
+      "source_layer_indices": [
+        13
+      ],
+      "source_layer_names": [
+        "蛋的数量：3"
+      ],
+      "source_layer_bbox": [
+        911,
+        665,
+        1089,
+        696
+      ],
+      "canvas_origin_psd_xy": [
+        909,
+        663
+      ],
+      "size_px": [
+        182,
+        35
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [],
+      "sha256_png": "c110927c9b956714bbdbcc5392d42e3c45db5536be7670f125ca84f0adc5db29",
+      "alias_transforms": {}
+    },
+    {
+      "path": "docs/art/reference/MockupText/number_23.png",
+      "label": "示意数字：23",
+      "category": "reference",
+      "source_layer_indices": [
+        14,
+        22
+      ],
+      "source_layer_names": [
+        "23",
+        "23 拷贝"
+      ],
+      "source_layer_bbox": [
+        1615,
+        137,
+        1681,
+        183
+      ],
+      "canvas_origin_psd_xy": [
+        1613,
+        135
+      ],
+      "size_px": [
+        70,
+        50
+      ],
+      "padding_px": 2,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "effects": [],
+      "sha256_png": "b4ae460191df494d612b0a2c89ac610179d5318cde2ea4f4a7d91a5635a289af",
+      "alias_transforms": {}
+    }
+  ],
+  "export_method": "psd-tools 1.22.0 compositing with stroke effects; native resolution; RGBA PNG",
+  "unity_import": {
+    "sprite_mode": "Single",
+    "pixels_per_unit": 100,
+    "pivot": [
+      0.5,
+      0.5
+    ],
+    "filter": "Bilinear",
+    "wrap": "Clamp",
+    "mipmaps": false,
+    "compression": "None",
+    "mesh": "Full Rect",
+    "max_texture_size": 2048
+  },
+  "user_decisions": {
+    "ordinary_creature": "A generic Creature visual still needs to be drawn. Its species is not prescribed; archer and guardian visuals remain references.",
+    "runtime_terminology": "Unit; all playable population units share the same gameplay rules."
+  },
+  "verification": {
+    "reconstructed_mean_channel_error_0_255": 0.043046231995884775,
+    "pixels_over_8_channel_error_percent": 0.2222222222222222,
+    "unity_import_play": "Pending",
+    "source_not_modified": true
+  },
+  "historical_user_decisions": {
+    "context": "Historical art-export decision, recorded before the Unit/Creature terminology update; not a current species requirement.",
+    "recorded_values": {
+      "ordinary_dog": "User confirmed ordinary dog still needs to be drawn; archer and guardian remain references."
+    }
+  }
+}

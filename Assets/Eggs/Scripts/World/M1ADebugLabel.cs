@@ -7,7 +7,7 @@ namespace Eggs.Gameplay
     public sealed class M1ADebugLabel : MonoBehaviour
     {
         [SerializeField] private TextMesh label;
-        [SerializeField] private DogUnit dog;
+        [SerializeField] private UnitActor unit;
         [SerializeField] private WorkZone zone;
         [SerializeField] private string heading;
 
@@ -19,9 +19,9 @@ namespace Eggs.Gameplay
                 return;
 
             text.Clear();
-            if (dog != null)
+            if (unit != null)
             {
-                text.Append(dog.name).Append('\n').Append(dog.CurrentState);
+                text.Append(unit.name).Append('\n').Append(unit.CurrentState);
             }
             else if (zone != null)
             {

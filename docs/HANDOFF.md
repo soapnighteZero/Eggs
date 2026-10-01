@@ -2,113 +2,117 @@
 
 ## Current Milestone
 
-M1A - Drag and Work Zones
+M1A - Drag and Work Zones. M1B has not started.
 
 ## Status
 
-Implementation complete, pending Play verification.
+Terminology & Art Foundation Update completed at the file level.
 
-**Pending Unity Compile / Play Verification** — 待人工 Play 验证。
+M1A previously Play-verified before terminology rename.
+Post-rename Unity compile / Play smoke check pending.
 
-## Completed
+The pre-rename Play result was reported by the user in this update request. This pass used code, files and terminal commands only; it did not run Unity import, compilation, the builder or Play. The successful offline C# checks below do not replace those Unity checks.
 
-- Added `DogWorkState`: Idle, Gathering, Breeding, Defending.
-- `DogUnit` owns its current state and current zone. All assignment changes go through `AssignTo`; the old zone removes the dog before the new zone registers it. Disabling a dog or zone clears its assignment.
-- One generic `WorkZone` supplies the target state, collider drop area, optional snap point, read-only member list and member count. The generated zones do not overlap and leave snap points empty so dogs keep their individual drop positions.
-- One `DogDragController` reads the existing Input System mouse and picks a single dog with Physics2D. It preserves the grab offset, immediately unassigns on pickup, and assigns by the dog's center on release.
-- Drops outside all zones become Idle. Drops inside multiple zones warn and reject assignment. Losing application focus, disabling the controller, or releasing outside the camera viewport cancels assignment and leaves the dog Idle. Drag positions stay within the camera view.
-- Physics2D transforms are explicitly synchronized before queries because the current project disables automatic transform synchronization.
-- Optional TextMesh labels show dog names/states and zone member counts without TMP resource import. Inspectors show read-only state, current zone and member references. Zone configuration is locked in the normal Inspector during Play.
-- Added `Tools > Eggs > Build M1A Prototype`. Its source creates a camera, controller, four colored dog prefab instances, three labeled zones and all references.
-- The tool stops if any open scene has unsaved changes. It asks before replacing the M1A scene, then builds a fresh scene rather than appending objects. Existing generated prefab, textures and material are reused. Only newly created assets and the target scene are saved; no unrelated scene or project setting is saved by the tool.
-- Sprites, font, materials and colors remain Inspector/Prefab references. Zone placeholder colors are on each zone's child SpriteRenderer. No gameplay code loads final art paths.
-- Added `.meta` files for all new scripts and their folders, preserving existing metadata.
-- No Food value/production, breeding process, eggs, population growth, combat or later-milestone systems were implemented. Breeding and Defending are work-state names only.
+## Terminology & Art Foundation Update (2026-10-01)
+
+- Runtime uses **Unit** (`UnitActor`, `UnitWorkState`, `UnitDragController`); design and art use **Creature / 小角色 / 小生物**. Runtime makes no assumption about the final character's species.
+- Renamed the three scripts and existing population prefab together with their original `.meta` files. Each metadata file is byte-identical to its pre-rename version; no GUID was generated for a renamed asset.
+- Updated all related types, parameters, collections, Inspector labels, debug text and builder output. `WorkZone` now exposes `CanAcceptUnits` and `IReadOnlyList<UnitActor>`.
+- Migrated the existing prefab and scene in place: script class identifiers, serialized field keys, object names and label text now use Unit. Script GUID references, prefab GUID references, file IDs and instance override targets remain intact.
+- The existing scene has `Unit 1` through `Unit 4` and one `Unit Drag Controller`. All four instances reference the same renamed prefab. No second population prefab was created, and no scene rebuild was needed for migration.
+- M1A gameplay behavior is unchanged. All seven C# files and both serialized assets were compared against a pre-edit snapshot and differ only by the reviewed terminology replacements.
+- No Food production, breeding process, egg logic, population growth, enemy behavior, nest HP, combat, wave, win/lose, training, career or species-specific ability was added. Existing exported enemy/egg artwork remains presentation data only.
+
+### Historical rename mapping
+
+The old names in this table describe the migration only. They are not current terminology or valid current asset paths.
+
+| Historical name | Current name | Preserved GUID |
+| --- | --- | --- |
+| `DogWorkState.cs` | `Assets/Eggs/Scripts/Core/UnitWorkState.cs` | `5da76d80f9d04f1299885cdd1e0bc8d9` |
+| `DogUnit.cs` | `Assets/Eggs/Scripts/Core/UnitActor.cs` | `0c7d909a39864aafabdb923ddcff9482` |
+| `DogDragController.cs` | `Assets/Eggs/Scripts/Interaction/UnitDragController.cs` | `149e15f06283426c972c7194d57dc313` |
+| `Dog_M1A.prefab` | `Assets/Eggs/Prefabs/Unit_M1A.prefab` | `852c52cd4b3879c4abe05e9dc93ce4c7` |
+
+### Current gameplay behavior
+
+- `UnitActor.AssignTo` owns state and zone assignment. A Unit belongs to at most one WorkZone; changing work removes its previous membership first. Disabling a Unit or zone clears the assignment.
+- `WorkZone` provides a target state, collider drop area, optional snap point, read-only members and count. The normal generated zones do not overlap and leave snap points empty.
+- `UnitDragController` uses the existing Input System mouse and Physics2D to drag one Unit at a time. It preserves the grab offset, clears assignment on pickup and uses the Unit's center for drop assignment.
+- Dropping outside all zones leaves the Unit Idle. Overlapping zones reject assignment with a warning. Losing focus, disabling the controller or releasing outside the camera viewport cancels assignment. Drag positions stay within the camera view; transforms are synchronized before Physics2D queries.
+- Optional TextMesh labels and read-only Inspector fields display states and membership. Zone configuration remains locked in the normal Inspector during Play.
+- `Tools > Eggs > Build M1A Prototype` builds four Unit instances and three zones. Existing dirty-scene protection, rebuild confirmation and asset reuse behavior are unchanged.
+
+### Art integration
+
+The current prefab keeps `UnitActor`, `CircleCollider2D`, `SpriteRenderer`, `SortingGroup` and `M1ADebugLabel` on its root, with a TextMesh State Label child. Its SpriteRenderer sprite and material can already be changed through the Prefab/Inspector. There is no Animator dependency in gameplay code; artists can add/configure one in the prefab when animations are available. No visual hierarchy refactor was needed.
+
+Final Creature identity belongs to presentation. Replacing a sprite or configuring an Animator must not require changes to `UnitActor`. Placeholder circles remain debug visuals. All playable population Units still share the same gameplay rules.
+
+Existing art preparation remains available: nine production PNGs under `Assets/Eggs/Art/`, eight reference PNGs under `docs/art/reference/`, an overview, the source layout preview and a layer manifest. The original PSD and all exported image files/importer metadata were preserved. The ordinary Creature visual still needs to be drawn; the archer and guardian remain references. See [ART_ASSETS.md](ART_ASSETS.md) for the full missing-art list and import notes. No art was newly connected to the scene in this terminology update.
 
 ## Actual Verification
 
-- Confirmed branch `Dada`, HEAD `e62f35382294d187110f46a40922110521b70787`, Unity `6000.6.3f1 (45d8eee7de74)`, and Input System package `1.20.0`.
-- Inspected the actual SampleScene, renderer, Graphics/Quality/Physics2D settings, package manifest and installed URP sprite shader. Active input handling is Input System.
-- Offline C# checks passed for the five runtime files and two Editor files using the installed Unity Roslyn compiler, Unity 6000.6.3f1 reference assemblies and local Input System assembly. Runtime and Editor were compiled separately; the runtime reference set excluded UnityEditor. Standard unused serialized-field warning CS0649 was suppressed for this external check.
-- Reviewed namespace/file references, drag cancellation, repeated assignment, membership cleanup and overlapping-zone rejection. Runtime has no UnityEditor dependency, no GameObject.Find wiring and no legacy Input calls.
-- This external compiler check does not execute Unity's asset import, scene builder, serialization, rendering or Play loop. Those results remain unverified.
+- Branch: `Dada`. HEAD: `1e947b6c090e3739646f80edb60820f4ef4e4c0e`. Unity version: `6000.6.3f1`.
+- Offline C# compilation passed for five Runtime files and two Editor files using the installed Unity Roslyn compiler, Unity reference assemblies and local Input System assembly. Runtime was compiled separately without UnityEditor references. Only the normal unused serialized-field warning CS0649 was suppressed.
+- Before/after comparisons confirmed that all seven source files and both scene/prefab texts differ only by the reviewed terminology mapping. Gameplay expressions, values and control flow were preserved.
+- All four renamed `.meta` files retained their exact contents. Old asset paths are absent; asset GUIDs are unique.
+- Strict YAML parsing passed. Scene/prefab file IDs are unchanged, nine custom Runtime script bindings resolve, and all four prefab instances and their override targets resolve. Debug-label, controller and zone references were checked; the Unit layer mask is unchanged.
+- Compared against the pre-edit snapshot: 135 other pre-existing files are unchanged, including art, generated placeholders, all Packages and ProjectSettings files, SampleScene and README. The user's existing QualitySettings change remains intact.
+- Current `Assets/Eggs` source and assets contain no old species terminology. Current GAME_SCOPE, README and ART_ASSETS contain none either. Retained occurrences elsewhere are the explicitly historical rename mapping/archive, the manifest's historical user decision, and AGENTS' required prohibition against assuming a species.
+- Ignored Unity-generated IDE/cache files can still contain old source paths until Unity refreshes them. They were not hand-edited and are not the current source of truth.
 
-## Play Verified
+**Post-rename actual Unity compile / Play: pending.** Visual rendering, Unity asset import and the builder have not been executed in this pass.
 
-None. Pending Play Verification.
+## Pending Manual Verification
 
-No Computer Use was used. Unity was not launched or controlled, the setup menu was not executed, and no Play test was performed.
+Verify the migrated existing scene before rebuilding it, so rebuilding cannot hide a migration problem.
 
-## Pending Verification
+1. Open the project in Unity `6000.6.3f1`, allow import/compile to finish and check the Console. Open `Assets/Eggs/Scenes/Eggs_M1A.unity` directly.
+2. Confirm no Missing Script, exactly four Units, one Unit Drag Controller and three zones. Inspect `UnitActor`, label Unit references, the controller's Unit Layers and its three zone references. Verify the four instances reference `Unit_M1A.prefab`.
+3. Enter Play. Initially all four Units must be Idle with zero zone members. Move Unit 1 through Food → Love Nest → Defense → blank space: Gathering → Breeding → Defending → Idle. Pickup must immediately remove its old membership; it must never belong to two zones.
+4. Assign the other Units independently. Move one Unit between zones at least ten times, drag through/overlap another Unit and click blank space. Confirm single-Unit drag, no duplicate or stale membership, no stuck drag and no new Console errors. Check both labels and the UnitActor/WorkZone Inspectors.
+5. While dragging, release outside the Game view or switch focus. The Unit must be Idle with no zone membership and remain draggable. If checking overlapping zones, use a temporary scene copy and expect a warning with rejected assignment.
+6. Exit Play. Save a separate copy before rebuilding any customized scene. Run `Tools > Eggs > Build M1A Prototype` and confirm rebuilding. Check that only `Unit_M1A.prefab` is used, with exactly four Unit instances, three zones, one camera and one controller. Save/reopen and recheck references, labels and input. The rebuild Cancel action and dirty-scene guard should preserve unsaved work.
+7. Record the actual post-rename Unity compile and Play results here. Do not start M1B as part of this update.
 
-### Manual setup
+## Files Changed in This Update
 
-1. Open this project in Unity 6000.6.3f1 and wait for compilation/import. Check the Console for errors.
-2. Save or close any unsaved scene yourself; the builder will stop while an open scene is dirty.
-3. Click `Tools > Eggs > Build M1A Prototype`.
-4. The tool saves and opens `Assets/Eggs/Scenes/Eggs_M1A.unity`. Use a landscape Game view (16:9 recommended), then enter Play.
+### Runtime
 
-### Required player flow
-
-| Check | Action and expected result |
-| --- | --- |
-| A | Initially, all four dogs show Idle and each zone shows Members: 0. |
-| B | Drag Dog 1 into FOOD and release: Gathering; Food Zone contains Dog 1 exactly once. |
-| C | Pick up Dog 1: immediately Idle and removed from Food Zone. Drop in LOVE NEST: Breeding; only Love Nest Zone contains Dog 1. |
-| D | Move Dog 1 to DEFENSE: Defending; Love Nest Zone no longer contains it. |
-| E | Drop Dog 1 on blank space: Idle, Current Zone empty, absent from all zone lists. |
-| F | Assign the other three dogs to different zones. Their states and membership remain independent. |
-| G | Move the same dog between the three zones at least 10 times. No duplicate membership, stale member, stuck drag, duplicate object or exception. |
-| H | Drag through another dog or overlap dogs: only one dog moves for a mouse press. |
-| I | Click blank space: no error or unintended assignment. |
-| J | Console: zero new errors from this task. |
-
-Inspect `DogUnit` (Current State / Current Zone) and `WorkZone` (Member Count / Member) while playing to check identities as well as the on-screen counts.
-
-### Setup and edge checks
-
-- Exit Play, rerun the builder and confirm rebuilding. There should still be exactly four dogs, three zones, one camera and one drag controller. Reopen the saved scene and confirm references, labels and input still work.
-- Verify the rebuild Cancel button and the dirty-scene guard preserve current work. Save a separate copy before rebuilding a customized M1A scene.
-- While dragging, release outside the Game view or switch application focus: the dog must remain available for another drag and have no zone membership.
-- If testing overlapping zone colliders, do so in a temporary scene copy: dropping a dog's center in both zones must warn and leave it Idle. The normal generated layout must produce no overlap warning.
-- Record the actual compile/Play results here after manual testing. Visual readability, font rendering, asset import and the setup tool itself have not yet been run in Unity.
-
-## Known Issues
-
-- Git still reports permission denied reading `C:/Users/95799/.config/git/ignore`. Repository status is readable; no Git configuration was changed.
-- At the start of M1A the working tree was clean, including `ProjectSettings/ProjectAuditorSettings.asset`. The earlier M0 modification was no longer reported. This task did not modify, restore or submit that file.
-- No runtime result is claimed; Unity-specific failures, if any, must be reported from the pending manual checks.
-
-## Files
-
-Created source files:
-
-- `Assets/Eggs/Scripts/Core/DogWorkState.cs`
-- `Assets/Eggs/Scripts/Core/DogUnit.cs`
+- `Assets/Eggs/Scripts/Core/UnitWorkState.cs` (renamed with metadata)
+- `Assets/Eggs/Scripts/Core/UnitActor.cs` (renamed with metadata)
+- `Assets/Eggs/Scripts/Interaction/UnitDragController.cs` (renamed with metadata)
 - `Assets/Eggs/Scripts/World/WorkZone.cs`
 - `Assets/Eggs/Scripts/World/M1ADebugLabel.cs`
-- `Assets/Eggs/Scripts/Interaction/DogDragController.cs`
+
+### Editor
+
 - `Assets/Eggs/Editor/M1APrototypeBuilder.cs`
 - `Assets/Eggs/Editor/M1ADebugInspectors.cs`
-- Seven matching script `.meta` files and six folder `.meta` files (`Eggs`, `Scripts`, `Core`, `World`, `Interaction`, `Editor`).
 
-Modified:
+### Existing assets
 
-- `docs/HANDOFF.md`
+- `Assets/Eggs/Prefabs/Unit_M1A.prefab` (renamed with metadata, serialized terminology migrated)
+- `Assets/Eggs/Scenes/Eggs_M1A.unity` (serialized terminology migrated; scene metadata preserved)
+- Existing `Assets/Eggs/Generated/M1A/Circle.png`, `Square.png`, `SpriteUnlit.mat`, their metadata and all art resources were unchanged.
 
-Generated only when the user runs the menu; not generated during this pass:
+### Documentation
 
-- `Assets/Eggs/Scenes/Eggs_M1A.unity`
-- `Assets/Eggs/Prefabs/Dog_M1A.prefab`
-- `Assets/Eggs/Generated/M1A/Square.png`
-- `Assets/Eggs/Generated/M1A/Circle.png`
-- `Assets/Eggs/Generated/M1A/SpriteUnlit.mat`
-- Unity-generated metadata for these assets and folders.
+- `AGENTS.md`: current Unit terminology and the required Terminology and Art Asset Rules section.
+- `docs/GAME_SCOPE.md`: generic character terminology; all gameplay rules retained.
+- `docs/ART_ASSETS.md`: current missing character is a generic Creature, with no prescribed species.
+- `docs/art/manifest.json`: current generic art decision; the original decision retained in an explicitly historical field.
+- `docs/HANDOFF.md`: current names, migration, verification and pending smoke check.
+- `docs/history/HANDOFF_BEFORE_UNIT_RENAME.md`: historical pre-update handoff, retained unchanged below an explanatory header.
+- `README.md` was inspected and already used generic terminology; no change was needed.
 
-## Next
+## History and Working Tree
 
-Perform and record M1A's manual Unity compilation, setup and Play checks. Fix any M1A issues before acceptance.
+The complete previous handoff is preserved in [the historical handoff](history/HANDOFF_BEFORE_UNIT_RENAME.md). Its old filenames and then-pending Play statements describe earlier passes, before the user's later report of a successful pre-rename Play check. They do not override the current status above.
 
-Only after M1A passes and is accepted may M1B begin. M1B has not started.
+At the start of this update, the working tree already contained an unrelated `ProjectSettings/QualitySettings.asset` modification and untracked exported art, M1A scene, prefab and generated placeholders. These were preserved; the existing scene and prefab were migrated as described above. Unstaged file renames may appear in `git status` as deleted old paths plus untracked new paths until staging; their Unity GUIDs are preserved independently of Git's display.
 
-No branch change, merge, reset, stash, commit or push was performed.
+Git reports permission denied reading `C:/Users/95799/.config/git/ignore`; repository status remains readable. No Git configuration was changed.
+
+No Computer Use, Unity launch/control, branch change, merge, reset, stash, commit or push was performed. The next action is the short manual post-rename Unity smoke check. M1B has not started.

@@ -6,17 +6,17 @@ using UnityEngine.Rendering;
 namespace Eggs.Gameplay
 {
     [DisallowMultipleComponent]
-    public sealed class DogDragController : MonoBehaviour
+    public sealed class UnitDragController : MonoBehaviour
     {
         [SerializeField] private Camera inputCamera;
         [SerializeField] private WorkZone[] workZones;
-        [SerializeField] private LayerMask dogLayers = Physics2D.DefaultRaycastLayers;
+        [SerializeField] private LayerMask unitLayers = Physics2D.DefaultRaycastLayers;
         [SerializeField] private float dragPlaneZ;
         [Min(0f)] [SerializeField] private float screenEdgePadding = 1.3f;
         [SerializeField] private int draggedSortingOrder = 100;
 
         private readonly List<Collider2D> hitColliders = new List<Collider2D>();
-        private DogUnit draggedDog;
+        private UnitActor draggedUnit;
         private Vector3 grabOffset;
         private SortingGroup draggedSortingGroup;
         private int previousSortingOrder;
@@ -25,7 +25,7 @@ namespace Eggs.Gameplay
         {
             if (inputCamera == null || !inputCamera.orthographic)
             {
-                Debug.LogError("DogDragController needs an assigned orthographic camera.", this);
+                Debug.LogError("UnitDragController needs an assigned orthographic camera.", this);
                 enabled = false;
             }
         }
@@ -46,17 +46,17 @@ namespace Eggs.Gameplay
                 return;
             }
 
-            if (draggedDog == null && mouse.leftButton.wasPressedThisFrame
+            if (draggedUnit == null && mouse.leftButton.wasPressedThisFrame
                 && inputCamera.pixelRect.Contains(screenPoint))
                 BeginDrag(worldPoint);
 
-            if (draggedDog == null || !draggedDog.isActiveAndEnabled)
+            if (draggedUnit == null || !draggedUnit.isActiveAndEnabled)
             {
                 FinishDrag(false);
                 return;
             }
 
-            draggedDog.transform.position = ClampToCamera(worldPoint + grabOffset);
+            draggedUnit.transform.position = ClampToCamera(worldPoint + grabOffset);
 
             if (mouse.leftButton.wasReleasedThisFrame)
                 FinishDrag(inputCamera.pixelRect.Contains(screenPoint));
@@ -69,7 +69,7 @@ namespace Eggs.Gameplay
             // The project disables auto-sync. Queries must see the last drag position.
             Physics2D.SyncTransforms();
             ContactFilter2D filter = new ContactFilter2D();
-            filter.SetLayerMask(dogLayers);
+            filter.SetLayerMask(unitLayers);
             filter.useTriggers = true;
             hitColliders.Clear();
             Physics2D.OverlapPoint(worldPoint, filter, hitColliders);
@@ -78,28 +78,28 @@ namespace Eggs.Gameplay
             float bestDistance = float.PositiveInfinity;
             foreach (Collider2D hit in hitColliders)
             {
-                DogUnit dog = hit.GetComponentInParent<DogUnit>();
-                if (dog == null || !dog.isActiveAndEnabled)
+                UnitActor unit = hit.GetComponentInParent<UnitActor>();
+                if (unit == null || !unit.isActiveAndEnabled)
                     continue;
 
-                SortingGroup group = dog.GetComponent<SortingGroup>();
+                SortingGroup group = unit.GetComponent<SortingGroup>();
                 int order = group != null ? group.sortingOrder : 0;
-                float distance = (dog.transform.position - worldPoint).sqrMagnitude;
-                // Select one visible candidate even when dogs overlap.
+                float distance = (unit.transform.position - worldPoint).sqrMagnitude;
+                // Select one visible candidate even when units overlap.
                 if (order < bestOrder || (order == bestOrder && distance >= bestDistance))
                     continue;
 
-                draggedDog = dog;
+                draggedUnit = unit;
                 bestOrder = order;
                 bestDistance = distance;
             }
 
-            if (draggedDog == null)
+            if (draggedUnit == null)
                 return;
 
-            grabOffset = draggedDog.transform.position - worldPoint;
-            draggedDog.AssignTo(null);
-            draggedSortingGroup = draggedDog.GetComponent<SortingGroup>();
+            grabOffset = draggedUnit.transform.position - worldPoint;
+            draggedUnit.AssignTo(null);
+            draggedSortingGroup = draggedUnit.GetComponent<SortingGroup>();
             if (draggedSortingGroup != null)
             {
                 previousSortingOrder = draggedSortingGroup.sortingOrder;
@@ -109,23 +109,23 @@ namespace Eggs.Gameplay
 
         private void FinishDrag(bool assignDrop)
         {
-            if (draggedDog != null)
+            if (draggedUnit != null)
             {
                 WorkZone zone = null;
                 if (assignDrop)
                 {
                     Physics2D.SyncTransforms();
-                    zone = FindUniqueZone(draggedDog.transform.position);
+                    zone = FindUniqueZone(draggedUnit.transform.position);
                 }
-                draggedDog.AssignTo(zone);
-                if (draggedDog.CurrentZone != null)
-                    draggedDog.transform.position = zone.GetDropPosition(draggedDog.transform.position);
+                draggedUnit.AssignTo(zone);
+                if (draggedUnit.CurrentZone != null)
+                    draggedUnit.transform.position = zone.GetDropPosition(draggedUnit.transform.position);
             }
 
             if (draggedSortingGroup != null)
                 draggedSortingGroup.sortingOrder = previousSortingOrder;
 
-            draggedDog = null;
+            draggedUnit = null;
             draggedSortingGroup = null;
         }
 
@@ -142,7 +142,7 @@ namespace Eggs.Gameplay
                 if (result != null)
                 {
                     Debug.LogWarning($"Drop overlaps '{result.name}' and '{zone.name}'. "
-                        + "Assignment rejected; dog stays Idle. Separate the work zones.", this);
+                        + "Assignment rejected; unit stays Idle. Separate the work zones.", this);
                     return null;
                 }
                 result = zone;
